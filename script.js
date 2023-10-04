@@ -1,4 +1,4 @@
-import A11yDialog from "https://cdn.jsdelivr.net/npm/a11y-dialog@8/dist/a11y-dialog.esm.min.js";
+import A11yDialog from "a11y-dialog";
 
 // Identify HTML elements
 const resultEl = document.getElementById("result");
