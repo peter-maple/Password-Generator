@@ -1,4 +1,4 @@
-import A11yDialog from "a11y-dialog";
+import A11yDialog from "https://cdn.jsdelivr.net/npm/a11y-dialog@8/dist/a11y-dialog.esm.min.js" /* "a11y-dialog" */;
 
 // Identify HTML elements
 const resultEl = document.getElementById("result");
@@ -16,15 +16,15 @@ const symbolsEl = document.getElementById("symbols");
 // Initialize custom menu button
 // ref: https://github.com/Heydon/inclusive-menu-button/tree/master
 
-// Identify menu button elem
-const spellphabetSelectButton = document.querySelector(
-    "[data-inclusive-menu-opens]"
-);
+// // Identify menu button elem
+// const spellphabetSelectButton = document.querySelector(
+//     "[data-inclusive-menu-opens]"
+// );
 
-// Make it a menu button with menuitemradio buttons
-const spellphabetSelectMenuButton = new MenuButton(spellphabetSelectButton, {
-    checkable: "one",
-});
+// // Make it a menu button with menuitemradio buttons
+// const spellphabetSelectMenuButton = new MenuButton(spellphabetSelectButton, {
+//     checkable: "one",
+// });
 
 // Define allowed characters
 // Character codes for lowercase and uppercase letters pulled from Unicode characters (lowercase a is #97)
