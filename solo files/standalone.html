@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="author" content="Peter Maple" />
+        <meta name="description" content="" />
+
+        <title>Password Generator</title>
+
+        <!-- Load external CSS styles -->
+        <link href="style.css" rel="stylesheet" />
+
+        <!-- Load external Google fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600&family=Fira+Code:wght@446&family=Inter+Tight:wght@400;555&family=Inter:slnt,wght@-7,480;0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+
+    <body>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;600;700&family=Fira+Code&display=swap");
+            @import url("https://fontlibrary.org//face/segment7");
+
+            @property --gradient-angle {
+                syntax: "<angle>";
+                initial-value: 0deg;
+                inherits: false;
+            }
+
+            body {
+                --color-bkg-1: hsl(0, 0%, 100%);
+                --color-bkg-2: hsl(0, 0%, 95%);
+                --color-bkg-3: hsl(0, 0%, 87%);
+
+                --color-text-1: hsl(0, 0%, 0%);
+                --color-text-number: lab(55 -11.72 -58.05);
+                --color-text-symbol: lab(49 83.99 -29.48);
+                --color-text-btn: var(--color-text-1);
+
+                --color-result-underline: hsl(0, 0%, 66%);
+
+                --color-num-bright: lab(55 -11.72 -58.05 / 0.45);
+                --color-num-bord: hsl(30, 7%, 71%);
+                --color-num-rim-edge: linear-gradient(
+                    to left,
+                    hsl(30 2% 50%) 0%,
+                    hsl(30 2% 60%) 18%,
+                    hsl(30 2% 60%) 82%,
+                    hsl(30 2% 50%) 100%
+                );
+
+                --color-btn-shadow: hsl(0deg 0% 0% / 0.5);
+                --shad-btn-rim-inner: 0 0 0 0.04rem grey;
+
+                --color-gen_btn-front: lab(81 -12.9 -25.14);
+                --color-gen_btn-rim: var(--shad-btn-rim-inner),
+                    0 0 0 0.34rem var(--color-gen_btn-front);
+                --color-gen_btn-edge: linear-gradient(
+                    to left,
+                    hsl(200deg 100% 26%) 0%,
+                    hsl(200deg 100% 40%) 8%,
+                    hsl(200deg 100% 40%) 92%,
+                    hsl(200deg 100% 26%) 100%
+                );
+
+                --color-btn-copy-front: lab(78 25.23 -36.4);
+                --color-copy-rim: var(--shad-btn-rim-inner),
+                    0 0 0 0.3rem var(--color-btn-copy-front);
+                --color-btn-copy-edge: linear-gradient(
+                    to left,
+                    hsl(275deg 28% 35%) 0%,
+                    hsl(275deg 28% 50%) 25%,
+                    hsl(275deg 28% 50%) 75%,
+                    hsl(275deg 28% 35%) 100%
+                );
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            .page-wrapper {
+                color: var(--color-text-1);
+                font-family: "Azeret Mono", "Courier New", Courier, monospace;
+                font-weight: normal;
+                background-color: var(--color-bkg-1);
+                padding: 15px;
+                min-height: 100vh;
+                display: grid;
+                place-content: center;
+                justify-items: center;
+            }
+
+            .app-container {
+                background-color: var(--color-bkg-2);
+                border-radius: 8px;
+
+                padding: 30px 0.8rem 1.8rem;
+                width: 42rem;
+                position: relative;
+            }
+
+            .title {
+                font-weight: 700;
+                margin: 5px 0 5px;
+                text-align: center;
+            }
+
+            .result-section {
+                background-color: var(--color-bkg-2);
+                padding: 20px 0;
+                position: relative;
+                width: 100%;
+                font-family: "Fira code", Courier, monospace;
+            }
+
+            .result-container {
+                color: white;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                align-items: center;
+                position: relative;
+                font-size: 46px;
+                letter-spacing: 1px;
+                padding: 12px 2rem 0px;
+                height: 60px;
+                margin: 0 0 0 0;
+            }
+
+            #result {
+                display: inline-block;
+                color: var(--color-text-1);
+                border-bottom: 4px solid var(--color-result-underline);
+                font-size: 2rem;
+                letter-spacing: 0.25ch;
+                min-width: 1ch;
+                padding-bottom: 1px;
+                margin: 0 5px 0 0;
+                height: 1.5em;
+            }
+
+            .output-number {
+                color: var(--color-text-number);
+            }
+
+            .output-symbol {
+                color: var(--color-text-symbol);
+            }
+
+            .spellphabet-section {
+                min-height: 8rem;
+                transition: height 200ms;
+
+                line-height: 200%;
+                width: 100%;
+                padding: 1rem 2rem 0;
+            }
+
+            .buttons {
+                display: flex;
+                gap: 2.5rem;
+                margin: auto;
+                width: 32.15rem;
+                position: relative;
+            }
+
+            .pushable {
+                font-family: "Azeret Mono", Courier, monospace;
+                font-size: 1.5rem;
+                font-weight: 600;
+                display: inline-block;
+                position: relative;
+                border: none;
+                border-radius: 12px;
+                background: transparent;
+                padding: 0;
+                outline-offset: 8px;
+                transition: filter 600ms;
+
+                -webkit-tap-highlight-color: transparent;
+                tap-highlight-color: transparent;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+
+            .rim {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: inherit;
+                background-color: transparent;
+                box-shadow: var(--color-gen_btn-rim);
+            }
+
+            .shadow {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: inherit;
+                background: var(--color-btn-shadow);
+
+                will-change: transform;
+                transform: translateY(2.5px);
+                transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+            }
+
+            .edge {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: inherit;
+                background: var(--color-gen_btn-edge);
+                transition: filter 600ms;
+            }
+
+            .front {
+                display: block;
+                position: relative;
+                padding: 12px 42px;
+                border-radius: inherit;
+                font-size: 1.25rem;
+                color: var(--color-text-btn);
+                background-color: var(--color-gen_btn-front);
+
+                will-change: transform;
+                transform: translateY(-5px);
+                transition: filter 600ms,
+                    transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+            }
+
+            .btn-copy {
+                .front {
+                    padding: 12px 16px;
+                    color: black;
+                    background-color: var(--color-btn-copy-front);
+                }
+
+                .edge {
+                    background: var(--color-btn-copy-edge);
+                }
+
+                .rim {
+                    box-shadow: var(--color-copy-rim);
+                }
+            }
+
+            .pushable:hover {
+                .front {
+                    transform: translateY(-6px);
+                    filter: brightness(110%);
+                    transition: filter 250ms,
+                        transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+                }
+
+                .edge {
+                    filter: brightness(110%);
+                    transition: filter 250ms;
+                }
+
+                .shadow {
+                    transform: translateY(4px);
+                    transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+                }
+            }
+
+            .pushable:active,
+            input[type="checkbox"]:checked + .pushable {
+                .front {
+                    transform: translateY(-2.1px);
+                    transition: transform 34ms;
+                }
+
+                .shadow {
+                    transform: translateY(1.5px);
+                    transition: transform 34ms;
+                }
+            }
+
+            .pushable:focus:not(:focus-visible) {
+                outline: none;
+            }
+
+            .spinner {
+                display: none;
+                width: 0px;
+            }
+
+            .number-input {
+                position: relative;
+                display: block;
+                box-shadow: 0 0 0 4px var(--color-num-bord);
+                border-radius: 0.5rem;
+                height: inherit;
+            }
+
+            .number-input .rim-edge {
+                background: var(--color-num-rim-edge);
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                border-radius: inherit;
+            }
+
+            input[type="number"]::-webkit-inner-spin-button,
+            input[type="number"]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            input[type="number"] {
+                -moz-appearance: textfield;
+                appearance: textfield;
+                font-size: 1.7rem;
+                font-family: "Segment7Standard", Courier, monospace;
+                color: var(--color-text-number);
+                background-color: rgb(247 247 247);
+                border-radius: inherit;
+                border: 0;
+                padding: 12px 2px 0px 5px;
+                position: relative;
+                transform: translateY(2px);
+                will-change: filter;
+                transition: filter 100ms;
+
+                height: 96%;
+            }
+
+            .number-input:hover {
+                filter: brightness(110%);
+                transition: filter 100ms;
+            }
+
+            .number-input label {
+                font-size: 0.5rem;
+                font-weight: 600;
+                position: absolute;
+                top: 0.3rem;
+                left: 0.43rem;
+            }
+
+            .num-rim {
+                box-shadow: 0 0 0 4px var(--color-num-bord);
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                left: 0;
+                border-radius: inherit;
+                background-color: transparent;
+            }
+
+            /* || Settings */
+
+            .settings-section {
+                font-size: 0.79rem;
+
+                display: grid;
+                gap: 1rem;
+                margin: 2.5rem 2rem 0;
+            }
+
+            .setting {
+                position: relative;
+                grid-row: 1;
+                box-shadow: 0 0 0.4rem 0rem grey;
+                border-radius: 0.5rem;
+
+                will-change: transform, filter;
+                transition: transform 200ms, filter 200ms;
+            }
+
+            .setting:has(:checked) {
+                box-shadow: none;
+            }
+
+            .setting:hover {
+                transform: scale(102%);
+                filter: brightness(120%);
+                transition: transform 70ms, filter 70ms;
+            }
+
+            .setting label {
+                display: block;
+                border-radius: inherit;
+            }
+
+            input[type="checkbox"] {
+                position: absolute;
+                opacity: 0;
+                height: 0;
+                width: 0;
+            }
+
+            .push-check {
+                border-radius: inherit;
+                position: relative;
+                z-index: 0;
+            }
+
+            :checked + .push-check {
+                background-color: var(--color-bkg-1);
+            }
+
+            .push-check::before,
+            .push-check::after {
+                content: "";
+                position: absolute;
+                inset: -0.1rem;
+                z-index: -1;
+                border-radius: 0.6rem;
+                background: conic-gradient(
+                    from var(--gradient-angle),
+                    rgb(15, 215, 215),
+                    rgb(148, 166, 238),
+                    rgb(3, 232, 232),
+                    rgb(208, 140, 233),
+                    rgb(135, 185, 235),
+                    rgb(15, 215, 215)
+                );
+
+                filter: opacity(0%);
+                transition: filter 130ms;
+            }
+
+            .push-check::after {
+                filter: blur(0.5rem) opacity(0%);
+            }
+
+            :checked + .push-check::before,
+            :checked + .push-check::after {
+                animation: rotation 10s linear infinite;
+                filter: opacity(50%);
+            }
+
+            :checked + .push-check::after {
+                filter: blur(0.5rem) opacity(50%);
+            }
+
+            /* prettier-ignore */
+            @keyframes rotation {
+                0%   { --gradient-angle: 0deg; }
+                100% { --gradient-angle: 360deg; }
+            }
+
+            .label-text {
+                position: relative;
+                background-color: var(--color-bkg-1);
+                padding: 0.6rem 0.6rem 0.6rem 1rem;
+                border-radius: inherit;
+
+                display: block;
+            }
+
+            @media screen and (max-width: 400px) {
+                .result-container {
+                    font-size: 14px;
+                }
+            }
+        </style>
+
+        <div class="page-wrapper">
+            <div class="app-container" id="main-content">
+                <h1 class="title">Password Generator</h1>
+                <section class="result-section">
+                    <div class="result-container">
+                        <span id="result"></span>
+                    </div>
+                    <div class="spellphabet-section">
+                        <div class="spellphabet-readout" id="spellphabet"></div>
+                    </div>
+                </section>
+                <div class="buttons">
+                    <div class="number-input">
+                        <span class="rim-edge"></span>
+                        <input
+                            type="number"
+                            id="lengthNumber"
+                            min="15"
+                            max="31"
+                            step="1"
+                            value="15"
+                        />
+                        <label for="lengthNumber" id="lengthLabel">
+                            LENGTH
+                        </label>
+                    </div>
+                    <button type="submit" class="gen pushable" id="generate">
+                        <span class="rim"></span>
+                        <span class="shadow"></span>
+                        <span class="edge"></span>
+                        <span class="front">Generate password</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-copy pushable"
+                        id="clipboard"
+                    >
+                        <span class="rim"></span>
+                        <span class="shadow"></span>
+                        <span class="edge"></span>
+                        <span class="front">Copy</span>
+                    </button>
+                </div>
+                <section class="settings-section">
+                    <div class="setting">
+                        <label for="lowercase">
+                            <input type="checkbox" id="lowercase" checked />
+                            <div class="push-check">
+                                <span class="label-text"
+                                    >lowercase letters</span
+                                >
+                            </div>
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label for="uppercase">
+                            <input type="checkbox" id="uppercase" checked />
+                            <div class="push-check">
+                                <span class="label-text"
+                                    >uppercase letters</span
+                                >
+                            </div>
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label for="numbers">
+                            <input type="checkbox" id="numbers" checked />
+                            <div class="push-check">
+                                <span class="label-text">numbers</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="setting">
+                        <label for="symbols">
+                            <input type="checkbox" id="symbols" unchecked />
+                            <div class="push-check">
+                                <span class="label-text">symbols</span>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Load scripts -->
+        <script defer>
+            // Identify HTML elements
+            const resultEl = document.getElementById("result");
+            const spellphabetEl = document.getElementById("spellphabet");
+
+            const thumbEl = document.getElementById("thumbBox");
+            const lengthEl = document.getElementById("lengthNumber");
+            const sliderEl = document.getElementById("slider");
+
+            const uppercaseEl = document.getElementById("uppercase");
+            const lowercaseEl = document.getElementById("lowercase");
+            const numbersEl = document.getElementById("numbers");
+            const symbolsEl = document.getElementById("symbols");
+
+            const generateBtn = document.getElementById("generate");
+            const clipboardBtn = document.getElementById("clipboard");
+
+            // Provide potential inputs
+            // Character codes for lowercase and uppercase letters
+            // Pulled from Unicode characters (lowercase a is #97)
+            const charCodes = Array.from(Array(26)).map((_, i) => i + 97);
+            const lowerLetters = charCodes.map((code) =>
+                String.fromCharCode(code)
+            );
+            const upperLetters = lowerLetters.map((letter) =>
+                letter.toUpperCase()
+            );
+            const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+            const symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "="];
+            // unused: '(',')','{','}','[',']','<','>','/',',','.'
+            // unused: const confusedChars = ["I", "l", "1", "O", "0"];
+
+            // Get localStorage items for key variables
+            // localStorage remembers settings across user sessions
+            function setLocalVariables() {
+                // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#getting_values_from_storage
+                const localSpellphabet = localStorage.getItem("spellphabet");
+
+                document.getElementById("spellphabet").value = localSpellphabet;
+            }
+            // // Listen for changes to variables and update local storage
+            // lengthEl.onchange = populateStorage;
+            // uppercaseEl.onchange = populateStorage;
+            // lowercaseEl.onchange = populateStorage;
+            // numbersEl.onchange = populateStorage;
+            // symbolsEl.onchange = populateStorage;
+
+            // Set localStorage values
+            function populateStorage() {
+                localStorage.setItem(
+                    "phon-alpha",
+                    document.getElementById("phon-alpha").value
+                );
+
+                setLocalVariables();
+            }
+            // const spellphabetLetters = lowerLetters.map((letter) => String);
+
+            // URL search parameters for tracking variables
+            let basicParamsObj = {
+                length: 15,
+                lower: true,
+                upper: true,
+                num: true,
+                sym: false,
+            };
+            const settingsParams = new URLSearchParams(basicParamsObj);
+            console.log(settingsParams.toString());
+
+            // Listen for changes to variables and update local storage
+            lengthEl.onchange = setParams;
+            uppercaseEl.onchange = setParams;
+            lowercaseEl.onchange = setParams;
+            numbersEl.onchange = setParams;
+            symbolsEl.onchange = setParams;
+
+            function setParams() {
+                const lengthParam = +lengthEl.value;
+                const hasLowerParam = lowercaseEl.checked;
+                const hasUpperParam = uppercaseEl.checked;
+                const hasNumbersParam = numbersEl.checked;
+                const hasSymbolsParam = symbolsEl.checked;
+
+                settingsParams.set("length", lengthParam);
+                settingsParams.set("lower", hasLowerParam);
+                settingsParams.set("upper", hasUpperParam);
+                settingsParams.set("num", hasNumbersParam);
+                settingsParams.set("sym", hasSymbolsParam);
+
+                // basicParamsObj = {
+                //   length: length,
+                //   lower: hasLower,
+                //   upper: hasUpper,
+                //   num: hasNumbers,
+                //   sym: hasSymbols,
+                // };
+
+                console.log(settingsParams.toString());
+            }
+
+            // || Core functionality
+
+            // || Copy button
+            // Copy result on click clipboard button
+            clipboardBtn.addEventListener("click", () => {
+                const textarea = document.createElement("textarea");
+                const password = resultEl.innerText;
+
+                if (!password) {
+                    alert("Nothing to copy. Generate a password first.");
+                    return;
+                }
+
+                textarea.value = password;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                textarea.remove();
+                alert("Password copied to clipboard.");
+            });
+
+            // || Generate password button
+            // Pass GUI variables to the Generate button on click
+            generateBtn.addEventListener("click", () => {
+                const length = parseInt(settingsParams.get("length"), 10);
+                const hasLower = settingsParams.get("lower") == "true";
+                const hasUpper = settingsParams.get("upper") == "true";
+                const hasNumbers = settingsParams.get("num") == "true";
+                const hasSymbols = settingsParams.get("sym") == "true";
+                // console.log("hasSymbols:", hasSymbols);
+
+                // Call generate password function, pass result to resultEl
+                resultEl.innerHTML = generatePassword(
+                    hasLower,
+                    hasUpper,
+                    hasNumbers,
+                    hasSymbols,
+                    length
+                );
+
+                // Call generate spelling alphabet function, pass result to spellphabetEl
+                spellphabetEl.innerHTML = generateSpellphabet();
+            });
+
+            // Generate password function
+            const generatePassword = (
+                hasLower,
+                hasUpper,
+                hasNumbers,
+                hasSymbols,
+                length
+            ) => {
+                const availableCharacters = [
+                    ...(hasLower ? lowerLetters : []),
+                    ...(hasUpper ? upperLetters : []),
+                    ...(hasNumbers ? numbers : []),
+                    ...(hasSymbols ? symbols : []),
+                ];
+                // console.log("availableCharacters:", availableCharacters);
+
+                let password = "";
+
+                if (availableCharacters.length === 0) {
+                    alert(
+                        "Please select at least one type of character to include in the password."
+                    );
+                    return "";
+                }
+
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(
+                        Math.random() * availableCharacters.length
+                    );
+                    password += availableCharacters[randomIndex];
+                }
+
+                // Add <span> elements to password to help with coloring
+                const numbersRegex = /(\d+)/g;
+                const symbolsRegex = /(\W+)/g;
+
+                // Replace
+                let finalPassword = password
+                    .replace(
+                        symbolsRegex,
+                        "<span class='output-symbol'>$1</span>"
+                    )
+                    .replace(
+                        numbersRegex,
+                        "<span class='output-number'>$1</span>"
+                    );
+
+                return finalPassword;
+            };
+
+            // Create and present spelling alphabet for generated password
+            const spellphabetObj = {};
+
+            // Default letters word list if user doesn't set another
+            const animalSpellphabet = [
+                "antelope",
+                "butterfly",
+                "crocodile",
+                "dinosaur",
+                "elephant",
+                "flamingo",
+                "gorilla",
+                "hippo",
+                "iguana",
+                "jaguar",
+                "kangaroo",
+                "lion",
+                "monkey",
+                "narwhal",
+                "ocelot",
+                "penguin",
+                "quail",
+                "rhino",
+                "seahorse",
+                "tiger",
+                "unicorn",
+                "vulture",
+                "walrus",
+                "x-ray (tetra)",
+                "yak",
+                "zebra",
+            ];
+            // console.log(animalSpellphabet);
+            // Alternative word lists for user selection
+            const placeSpellphabet = [
+                "arizona",
+                "boston",
+                "canada",
+                "delaware",
+                "egypt",
+                "florida",
+                "georgia",
+                "hawai'i",
+                "idaho",
+                "jamaica",
+                "kentucky",
+                "louisiana",
+                "montana",
+                "nevada",
+                "oregon",
+                "pennsylvania",
+                "queens",
+                "rhode island",
+                "switzerland",
+                "tennessee",
+                "utah",
+                "virginia",
+                "wyoming",
+                "xanadu (in Utah)",
+                "yemen",
+                "zimbabwe",
+            ];
+            const fantasySpellphabet = [
+                "amulet",
+                "broom-bewitch",
+                "crystal ball",
+                "dragon",
+                "enchantress",
+                "fairy",
+                "goblin",
+                "hobbit",
+                "incantation",
+                "jinx",
+                "kingdom",
+                "lady of the lake",
+                "magic",
+                "necromancy",
+                "ogre",
+                "potion-pixie",
+                "quest",
+                "ritual",
+                "sorcery",
+                "talisman",
+                "unicorn",
+                "vampire",
+                "wizard",
+                "x-ray vision",
+                "yeti",
+                "zombie",
+            ];
+            const fruitAndVegSpellphabet = [
+                "apple",
+                "banana",
+                "cucumber",
+                "dragonfruit",
+                "eggplant",
+                "fig",
+                "grapes",
+                "honeydew",
+                "iceberg lettuce",
+                "juice",
+                "kiwi",
+                "lemon",
+                "mango",
+                "nectarine",
+                "orange",
+                "pomegranate",
+                "quince",
+                "raspberry",
+                "strawberry",
+                "tomato",
+                "ugli",
+                "vine",
+                "watermelon",
+                "x-ray fruit (made up)",
+                "yam",
+                "zucchini",
+            ];
+            // Unchanging "spellphabet" words: symbols and numbers
+            const symbolsTempObj = {
+                "!": "exclamation point",
+                "@": "at symbol",
+                "#": "hash symbol",
+                $: "dollar sign",
+                "%": "percent symbol",
+                "^": "caret symbol",
+                "&": "ampersand",
+                "*": "asterix",
+                "=": "equals sign",
+            };
+
+            for (const [key, value] of Object.entries(symbolsTempObj)) {
+                spellphabetObj[
+                    key
+                ] = `<span class='output-symbol'><i>${value}</i></span>`;
+            }
+
+            // Push numbers array into the static Obj with "number" label
+            numbers.forEach((element) => {
+                spellphabetObj[
+                    element
+                ] = `<span class='output-number'>number ${element}</span>`;
+            });
+
+            // Variable "spellphabet" words: letters
+            // toDo: modify currentSpellphabet - define with ternary statement that checks if a custom wordlist was input
+            let currentSpellphabet = animalSpellphabet;
+
+            // Combine letters array with the set spellphabet
+            lowerLetters.forEach((element, index) => {
+                spellphabetObj[element] = currentSpellphabet.at(index);
+            });
+            upperLetters.forEach((element, index) => {
+                const upperSpellphabet = currentSpellphabet.map((word) =>
+                    word.toUpperCase()
+                );
+                spellphabetObj[element] = upperSpellphabet.at(index);
+            });
+
+            // Object.ssign(spellphabetObj, staticSpellphabetObj);
+
+            // console.table(spellphabetObj);
+
+            const generateSpellphabet = () => {
+                let pwArray = Array.from(resultEl.innerText);
+                // console.log("pwArray:", pwArray);
+
+                const spellingPWArray = pwArray.map(
+                    (char) => spellphabetObj[char]
+                );
+                // console.log("spellingPWArray:", spellingPWArray);
+
+                const spellingPW = spellingPWArray.join(" — ");
+
+                return spellingPW;
+            };
+
+            // || Slider control
+            // lengthEl.value = sliderEl.value;
+
+            // sliderEl.oninput = setValue(sliderEl);
+
+            // const setValue = (source) => {
+            //   let x = source.value;
+            //   // range: 15 - 31; if 15 = 0, 31 = 16
+            //   thumbEl.style.left = (x - 15) / 16 + "%";
+            //   lengthEl.value = x;
+            //   // lengthEl.setAttribute(value, x);
+            // };
+
+            //
+            // https://codingartistweb.com/2021/07/custom-range-slider-html-css-javascript/
+            // const mySlider = document.getElementById("my-slider");
+            // const sliderValue = document.getElementById("slider-value");
+            const setLengthBtn = document.getElementById("setLength");
+            const matchLengthBtn = document.getElementById("matchLength");
+
+            setLengthBtn.addEventListener("click", () => {
+                lengthEl.value = 29;
+            });
+            // matchLengthBtn.addEventListener("click", () => {
+            //   lengthEl.value = sliderEl.value;
+            // });
+
+            // sliderEl.addEventListener("input", setLength);
+            // sliderEl.addEventListener("input", () => {
+            sliderEl.oninput = () => {
+                let valRaw = sliderEl.value;
+                let valPercent = ((valRaw - 15) / (sliderEl.max - 15)) * 100;
+                sliderEl.style.background = `linear-gradient(to right, #3264fe ${valPercent}%, #d5d5d5 ${valPercent}%)`;
+                thumbEl.style.left = `${valPercent}%`;
+                lengthEl.value = valRaw;
+            };
+
+            // setLength();
+            // sliderEl.oninput = setLength;
+            //  () => {
+            //   lengthEl.value = sliderEl.value;
+            // }; */
+            lengthEl.oninput = () => {
+                sliderEl.value = lengthEl.value;
+            };
+            // sliderEl.oninput = slider();
+
+            const setLength = (value) => {
+                // let valRaw = sliderEl.value;
+                // let valPercent = (valRaw / sliderEl.max) * 100;
+                // sliderEl.style.background = `linear-gradient(to right, #3264fe ${valPercent}%, #d5d5d5 ${valPercent}%)`;
+                // thumbEl.style.left = `${valPercent}%`;
+                lengthEl.value = value;
+            };
+            const setSlider = () => {};
+
+            // https://codingartistweb.com/2021/06/input-stepper-css-vanilla-javascript/
+            function stepper(triggerBtn) {
+                let id = triggerBtn.getAttribute("id");
+                let min = lengthEl.getAttribute("min");
+                let max = lengthEl.getAttribute("max");
+                let step = lengthEl.getAttribute("step");
+                let val = lengthEl.getAttribute("value");
+                let calcStep = id == "increment" ? step * 1 : step * -1;
+                let newValue = parseInt(val) + calcStep;
+
+                if (newValue >= min && newValue <= max) {
+                    lengthEl.setAttribute("value", newValue);
+                }
+            }
+
+            //
+            //
+            //
+
+            // add ability to provide CSV list for custom phonetic alphabet
+
+            // style length [number] input to have separate + - buttons
+
+            // add alternate provided spellphabets that users can select from a dropdown menu ----- then display the custom spellphabets in that dropdown menu (add name field to custom input to label list in the menu--provide a default incrementing name if none is selected)
+            // add ability to delete custom word lists
+            // add ability to export custom word lists ----- could just have a popover dialogue that gives a text field populated with the "csv" text
+
+            // at narrowness breakpoint, switch settings list from row display to column
+
+            // make thumb pointer switch to "grabbing" on mousedown...
+            // remove alert if no boxes checked. instead implement model like dashlane where you can't uncheck minimum # of boxes. but maybe throw a little error message so it's less confusing.
+
+            //
+            // || Done:
+            //
+
+            // figure out how to exclude commonly confused characters
+            // color numbers and symbols differently from letters
+
+            // a b c d e f g h i j k l m n o p q r s t u v w x y z
+            // add phonetic alphabet field
+
+            // set it all up so that the chosen basic settings can be shared
+            // either using URL modifiers like the old one or with a settings export/import tool. latter is worse for single-action sharing of the tool.
+            // either way requires figuring out how to make the settings reference a text area or something...
+        </script>
+    </body>
+</html>
