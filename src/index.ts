@@ -49,19 +49,26 @@ class SpellingAlphabet {
     elementHTML: string;
     elem: HTMLElement | null;
 
-    constructor(name: string, wordList: string[]) {
+    constructor(name: string, wordList: string[], complete = true) {
         this.name = name;
         this.id = symbolsToDashes(this.name);
         this.wordList = wordList;
 
         this.elementHTML = this.getHTML(this.name);
 
-        spellselectEl.append(
-            document.createRange().createContextualFragment(this.elementHTML)
-        );
+        if (complete) {
+            spellselectEl.append(
+                document
+                    .createRange()
+                    .createContextualFragment(this.elementHTML)
+            );
 
-        this.elem = document.getElementById(this.id);
-        console.log(this.elem);
+            this.elem = document.getElementById(this.id);
+        } else this.elem = null;
+        // console.log(this.elem);
+
+        spellphabets.push(this);
+        console.log(spellphabets);
     }
 
     getHTML = (name: string) => {
@@ -74,8 +81,10 @@ class SpellingAlphabet {
     };
 }
 
+const spellphabets: SpellingAlphabet[] = [];
+
 // Default letters word list if user doesn't set another
-const animalSpellphabet = [
+const animalsSpellphabet = new SpellingAlphabet("Animals", [
     "antelope",
     "butterfly",
     "crocodile",
@@ -102,40 +111,42 @@ const animalSpellphabet = [
     "x-ray (tetra)",
     "yak",
     "zebra",
-];
-
-new SpellingAlphabet("Animals", animalSpellphabet);
+]);
 
 // Alternative word lists for user selection
-const placesSpellphabet = [
-        "arizona",
-        "boston",
-        "canada",
-        "delaware",
-        "egypt",
-        "florida",
-        "georgia",
-        "hawai'i",
-        "idaho",
-        "jamaica",
-        "kentucky",
-        "louisiana",
-        "montana",
-        "nevada",
-        "oregon",
-        "pennsylvania",
-        "queens",
-        "rhode island",
-        "switzerland",
-        "tennessee",
-        "utah",
-        "virginia",
-        "wyoming",
-        "x-ray town (made up)",
-        "yemen",
-        "zimbabwe",
-    ],
-    clearNEasySpellphabet = [
+const placesSpellphabet = new SpellingAlphabet(
+        "Places",
+        [
+            "arizona",
+            "boston",
+            "canada",
+            "delaware",
+            "egypt",
+            "florida",
+            "georgia",
+            "hawai'i",
+            "idaho",
+            "jamaica",
+            "kentucky",
+            "louisiana",
+            "montana",
+            "nevada",
+            "oregon",
+            "pennsylvania",
+            "queens",
+            "rhode island",
+            "switzerland",
+            "tennessee",
+            "utah",
+            "virginia",
+            "wyoming",
+            "x-ray town (made up)",
+            "yemen",
+            "zimbabwe",
+        ],
+        false
+    ),
+    clearNEasySpellphabet = new SpellingAlphabet("Clear n' Easy", [
         "apple",
         "bagel",
         "cactus",
@@ -162,36 +173,40 @@ const placesSpellphabet = [
         "x-ray",
         "yellow",
         "zebra",
-    ],
-    natureSpellphabet = [
-        "a",
-        "bumble bee",
-        "c",
-        "daisy",
-        "e",
-        "forest",
-        "glacier",
-        "highland",
-        "iceberg",
-        "j",
-        "k",
-        "lagoon",
-        "meadow",
-        "n",
-        "o",
-        "petunia",
-        "q",
-        "river",
-        "sunrise",
-        "tumbleweed",
-        "u",
-        "vine",
-        "w",
-        "x",
-        "y",
-        "z",
-    ],
-    fantasySpellphabet = [
+    ]),
+    natureSpellphabet = new SpellingAlphabet(
+        "Nature",
+        [
+            "a",
+            "bumble bee",
+            "c",
+            "daisy",
+            "e",
+            "forest",
+            "glacier",
+            "highland",
+            "iceberg",
+            "j",
+            "k",
+            "lagoon",
+            "meadow",
+            "n",
+            "o",
+            "petunia",
+            "q",
+            "river",
+            "sunrise",
+            "tumbleweed",
+            "u",
+            "vine",
+            "w",
+            "x",
+            "y",
+            "z",
+        ],
+        false
+    ),
+    fantasySpellphabet = new SpellingAlphabet("Fantasy", [
         "amulet",
         "bewitch",
         "crystal ball",
@@ -218,8 +233,8 @@ const placesSpellphabet = [
         "x-ray vision",
         "yeti",
         "zombie",
-    ],
-    fruitAndVegSpellphabet = [
+    ]),
+    fruitAndVegSpellphabet = new SpellingAlphabet("Fruit n' Veg", [
         "apple",
         "banana",
         "cucumber",
@@ -246,7 +261,7 @@ const placesSpellphabet = [
         "x-ray fruit (made up)",
         "yam",
         "zucchini",
-    ];
+    ]);
 
 interface Settings {
     length: number;
@@ -254,7 +269,7 @@ interface Settings {
     upper: boolean;
     num: boolean;
     sym: boolean;
-    spellphabet: string[];
+    spellphabet: SpellingAlphabet;
 }
 const settings = {
     // Specify default values.
@@ -263,7 +278,7 @@ const settings = {
     upper: true,
     num: true,
     sym: false,
-    spellphabet: animalSpellphabet,
+    spellphabet: animalsSpellphabet,
 };
 
 function updateSettings() {
@@ -272,7 +287,7 @@ function updateSettings() {
     settings.upper = uppercaseEl.checked;
     settings.num = numbersEl.checked;
     settings.sym = symbolsEl.checked;
-    settings.spellphabet = animalSpellphabet;
+    settings.spellphabet = animalsSpellphabet;
 }
 
 // Listen for changes to variables and update local storage
@@ -340,8 +355,8 @@ const symbolsObj = {
 
 const generateSpellphabet = (
     password: string,
-    // Provide animalSpellphabet as a default argument:
-    currentSpellphabet: string[] = animalSpellphabet
+    // Provide animalsSpellphabet as a default argument:
+    currentSpellphabet: string[] = animalsSpellphabet.wordList
 ) => {
     interface SpellingAlphabetType {
         [index: string]: string;
@@ -405,7 +420,10 @@ const handleGenerate = function (settings: Settings) {
     const pword = resultEl.innerText;
 
     // Generate a spelling alphabet version of PW, pass result to spellphabetEl
-    spellphabetEl.innerHTML = generateSpellphabet(pword, settings.spellphabet);
+    spellphabetEl.innerHTML = generateSpellphabet(
+        pword,
+        settings.spellphabet.wordList
+    );
 };
 
 // Pass GUI variables to the Generate button on click
