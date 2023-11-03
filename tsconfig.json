@@ -8,7 +8,9 @@
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "noImplicitReturns": true,
-        "moduleResolution": "node"
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "sourceMap": true
     }
     // "include": ["./src/**/*"]
 }

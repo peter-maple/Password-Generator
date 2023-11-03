@@ -15,12 +15,12 @@ module.exports = {
         clean: true,
     },
 
-    // Enable sourcemaps for debugging webpack's output.
-    devtool: "source-map",
+    /*     // Enable sourcemaps for debugging webpack's output.
+    devtool: "source-map", */
 
-    devServer: {
+    /*     devServer: {
         static: "./dist",
-    },
+    }, */
 
     plugins: [
         new ForkTsCheckerWebpackPlugin(),

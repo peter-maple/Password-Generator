@@ -3,6 +3,10 @@
 import A11yDialog from "a11y-dialog";
 import "./style.css";
 
+if (process.env.NODE_ENV !== "production") {
+    console.log("Looks like we are in development mode!");
+}
+
 // Identify HTML elements
 const resultEl = document.getElementById("result") as HTMLElement;
 const spellphabetEl = document.getElementById("spellphabet") as HTMLElement;
@@ -58,6 +62,14 @@ const animalSpellphabet = [
     "zebra",
 ];
 
+interface Settings {
+    length: number;
+    lower: boolean;
+    upper: boolean;
+    num: boolean;
+    sym: boolean;
+    spellphabet: string[];
+}
 const settings = {
     // Specify default values.
     length: 15,
@@ -88,13 +100,7 @@ symbolsEl.onchange = updateSettings;
 // || Core functionality
 
 // Generate password function
-const generatePassword = (settings: {
-    length: number;
-    lower: boolean;
-    upper: boolean;
-    num: boolean;
-    sym: boolean;
-}): string | void => {
+const generatePassword = (settings: Settings): string | void => {
     const availableCharacters = [
         // If settings.lower is true, include lowerLetters in availableCharacters.
         // Using spread syntax (...) to add the individual characters instead of the array as a single object.
@@ -114,7 +120,7 @@ const generatePassword = (settings: {
         return;
     }
 
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < settings.length; i++) {
         const randomIndex = Math.floor(
             Math.random() * availableCharacters.length
         );
@@ -290,7 +296,7 @@ const symbolsObj = {
 
 const generateSpellphabet = (
     password: string,
-    // Provide animalSpellphabet as a default argument.
+    // Provide animalSpellphabet as a default argument:
     currentSpellphabet: string[] = animalSpellphabet
 ) => {
     interface SpellingAlphabetType {
@@ -347,7 +353,7 @@ const generateSpellphabet = (
 
 // || Generate password button
 
-const handleGenerate = function () {
+const handleGenerate = function (settings: Settings) {
     const newPW = generatePassword(settings);
 
     // Call generate password function, pass result to resultEl
@@ -359,7 +365,9 @@ const handleGenerate = function () {
 };
 
 // Pass GUI variables to the Generate button on click
-generateBtn.addEventListener("click", handleGenerate);
+generateBtn.addEventListener("click", () => {
+    handleGenerate(settings);
+});
 
 // || Copy button
 
