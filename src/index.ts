@@ -1,30 +1,24 @@
-import A11yDialog from "https://cdn.jsdelivr.net/npm/a11y-dialog@8/dist/a11y-dialog.esm.min.js" /* "a11y-dialog" */;
+// import A11yDialog from "https://cdn.jsdelivr.net/npm/a11y-dialog@8/dist/a11y-dialog.esm.min.js" /* "a11y-dialog" */;
+
+import A11yDialog from "a11y-dialog";
+import "./style.css";
 
 // Identify HTML elements
-const resultEl = document.getElementById("result");
-const spellphabetEl = document.getElementById("spellphabet");
+const resultEl = document.getElementById("result") as HTMLElement;
+const spellphabetEl = document.getElementById("spellphabet") as HTMLElement;
 
-const lengthEl = document.getElementById("lengthNumber");
-const generateBtn = document.getElementById("generate");
-const clipboardBtn = document.getElementById("clipboard");
+const generateBtn = document.getElementById("generate") as HTMLElement;
+const clipboardBtn = document.getElementById("clipboard") as HTMLElement;
 
-const uppercaseEl = document.getElementById("uppercase");
-const lowercaseEl = document.getElementById("lowercase");
-const numbersEl = document.getElementById("numbers");
-const symbolsEl = document.getElementById("symbols");
+const lengthEl = document.getElementById("lengthNumber") as HTMLInputElement;
+
+const uppercaseEl = document.getElementById("uppercase") as HTMLInputElement;
+const lowercaseEl = document.getElementById("lowercase") as HTMLInputElement;
+const numbersEl = document.getElementById("numbers") as HTMLInputElement;
+const symbolsEl = document.getElementById("symbols") as HTMLInputElement;
 
 // Initialize custom menu button
 // ref: https://github.com/Heydon/inclusive-menu-button/tree/master
-
-// // Identify menu button elem
-// const spellphabetSelectButton = document.querySelector(
-//     "[data-inclusive-menu-opens]"
-// );
-
-// // Make it a menu button with menuitemradio buttons
-// const spellphabetSelectMenuButton = new MenuButton(spellphabetSelectButton, {
-//     checkable: "one",
-// });
 
 // Define allowed characters
 // Character codes for lowercase and uppercase letters pulled from Unicode characters (lowercase a is #97)
@@ -33,113 +27,6 @@ const lowerLetters = charCodes.map((code) => String.fromCharCode(code));
 const upperLetters = lowerLetters.map((letter) => letter.toUpperCase());
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 const symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "="];
-
-// URL search parameters for tracking variables
-let basicParamsObj = {
-    length: 15,
-    lower: true,
-    upper: true,
-    num: true,
-    sym: false,
-};
-const settingsParams = new URLSearchParams(basicParamsObj);
-// console.log(settingsParams.toString());
-
-// Listen for changes to variables and update local storage
-lengthEl.onchange = setParams;
-uppercaseEl.onchange = setParams;
-lowercaseEl.onchange = setParams;
-numbersEl.onchange = setParams;
-symbolsEl.onchange = setParams;
-
-function setParams() {
-    const lengthParam = +lengthEl.value;
-    const hasLowerParam = lowercaseEl.checked;
-    const hasUpperParam = uppercaseEl.checked;
-    const hasNumbersParam = numbersEl.checked;
-    const hasSymbolsParam = symbolsEl.checked;
-
-    settingsParams.set("length", lengthParam);
-    settingsParams.set("lower", hasLowerParam);
-    settingsParams.set("upper", hasUpperParam);
-    settingsParams.set("num", hasNumbersParam);
-    settingsParams.set("sym", hasSymbolsParam);
-
-    // console.log(settingsParams.toString());
-}
-
-// || Core functionality
-
-// || Generate password button
-
-// Pass GUI variables to the Generate button on click
-generateBtn.addEventListener("click", () => {
-    const length = parseInt(settingsParams.get("length"), 10);
-    const hasLower = settingsParams.get("lower") == "true";
-    const hasUpper = settingsParams.get("upper") == "true";
-    const hasNumbers = settingsParams.get("num") == "true";
-    const hasSymbols = settingsParams.get("sym") == "true";
-    // console.log("hasSymbols:", hasSymbols);
-
-    // Call generate password function, pass result to resultEl
-    resultEl.innerHTML = generatePassword(
-        hasLower,
-        hasUpper,
-        hasNumbers,
-        hasSymbols,
-        length
-    );
-
-    // Call generate spelling alphabet function, pass result to spellphabetEl
-    spellphabetEl.innerHTML = generateSpellphabet();
-});
-
-// Generate password function
-const generatePassword = (
-    hasLower,
-    hasUpper,
-    hasNumbers,
-    hasSymbols,
-    length
-) => {
-    const availableCharacters = [
-        ...(hasLower ? lowerLetters : []),
-        ...(hasUpper ? upperLetters : []),
-        ...(hasNumbers ? numbers : []),
-        ...(hasSymbols ? symbols : []),
-    ];
-    // console.log("availableCharacters:", availableCharacters);
-
-    let password = "";
-
-    if (availableCharacters.length === 0) {
-        alert(
-            "Please select at least one type of character to include in the password."
-        );
-        return "";
-    }
-
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(
-            Math.random() * availableCharacters.length
-        );
-        password += availableCharacters[randomIndex];
-    }
-
-    // Add <span> elements to password to help with coloring
-    const numbersRegex = /(\d+)/g;
-    const symbolsRegex = /(\W+)/g;
-
-    // Replace
-    let finalPassword = password
-        .replace(symbolsRegex, "<span class='output-symbol'>$1</span>")
-        .replace(numbersRegex, "<span class='output-number'>$1</span>");
-
-    return finalPassword;
-};
-
-// Create and present spelling alphabet for generated password
-const spellphabetObj = {};
 
 // Default letters word list if user doesn't set another
 const animalSpellphabet = [
@@ -171,6 +58,81 @@ const animalSpellphabet = [
     "zebra",
 ];
 
+const settings = {
+    // Specify default values.
+    length: 15,
+    lower: true,
+    upper: true,
+    num: true,
+    sym: false,
+    spellphabet: animalSpellphabet,
+};
+
+function updateSettings() {
+    settings.length = +lengthEl.value;
+    settings.lower = lowercaseEl.checked;
+    settings.upper = uppercaseEl.checked;
+    settings.num = numbersEl.checked;
+    settings.sym = symbolsEl.checked;
+    settings.spellphabet = animalSpellphabet;
+}
+
+// Listen for changes to variables and update local storage
+lengthEl.onchange = updateSettings;
+uppercaseEl.onchange = updateSettings;
+lowercaseEl.onchange = updateSettings;
+numbersEl.onchange = updateSettings;
+symbolsEl.onchange = updateSettings;
+// spellselect trigger.....
+
+// || Core functionality
+
+// Generate password function
+const generatePassword = (settings: {
+    length: number;
+    lower: boolean;
+    upper: boolean;
+    num: boolean;
+    sym: boolean;
+}): string | void => {
+    const availableCharacters = [
+        // If settings.lower is true, include lowerLetters in availableCharacters.
+        // Using spread syntax (...) to add the individual characters instead of the array as a single object.
+        ...(settings.lower ? lowerLetters : []),
+        ...(settings.upper ? upperLetters : []),
+        ...(settings.num ? numbers : []),
+        ...(settings.sym ? symbols : []),
+    ];
+    // console.log("availableCharacters:", availableCharacters);
+
+    let password = "";
+
+    if (availableCharacters.length === 0) {
+        alert(
+            "Please select at least one type of character to include in the password."
+        );
+        return;
+    }
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(
+            Math.random() * availableCharacters.length
+        );
+        password += availableCharacters[randomIndex];
+    }
+
+    // Add <span> elements to password to help with coloring
+    const numbersRegex = /(\d+)/g;
+    const symbolsRegex = /(\W+)/g;
+
+    // Replace
+    let finalPassword = password
+        .replace(symbolsRegex, "<span class='output-symbol'>$1</span>")
+        .replace(numbersRegex, "<span class='output-number'>$1</span>");
+
+    return finalPassword;
+};
+
 // Alternative word lists for user selection
 const placeSpellphabet = [
         "arizona",
@@ -196,7 +158,7 @@ const placeSpellphabet = [
         "utah",
         "virginia",
         "wyoming",
-        "xanadu (in Utah)",
+        "x-ray town (made up)",
         "yemen",
         "zimbabwe",
     ],
@@ -326,37 +288,53 @@ const symbolsObj = {
     "=": "equals sign",
 };
 
-for (const [key, value] of Object.entries(symbolsObj)) {
-    spellphabetObj[key] = `<span class='output-symbol'><i>${value}</i></span>`;
-}
+const generateSpellphabet = (
+    password: string,
+    // Provide animalSpellphabet as a default argument.
+    currentSpellphabet: string[] = animalSpellphabet
+) => {
+    interface SpellingAlphabetType {
+        [index: string]: string;
+    }
 
-// Push numbers array into the final spellphabet with "number" label
-numbers.forEach((num) => {
-    spellphabetObj[num] = `<span class='output-number'>number ${num}</span>`;
-});
+    // Create and present spelling alphabet for generated password
+    const spellphabetObj: SpellingAlphabetType = {};
 
-// Variable "spellphabet" words: letters
-// toDo: modify currentSpellphabet - define with ternary statement that checks if a custom wordlist was input
-let currentSpellphabet = animalSpellphabet;
+    for (const [key, value] of Object.entries(symbolsObj)) {
+        spellphabetObj[
+            key
+        ] = `<span class='output-symbol'><i>${value}</i></span>`;
+    }
 
-// Combine letters array with the set spellphabet.
-// For each lowercase letter, create a key-value pair in the spellphabet object of "[letter]: [word]"
-lowerLetters.forEach((letter, index) => {
-    spellphabetObj[letter] = currentSpellphabet.at(index);
-});
-// For each capital letter, create a key-value pair in the spellphabet object of "[letter]: [WORD]"
-upperLetters.forEach((letter, index) => {
-    const upperSpellphabet = currentSpellphabet.map((word) =>
-        word.toUpperCase()
-    );
-    spellphabetObj[letter] = upperSpellphabet.at(index);
-});
+    // Push numbers array into the final spellphabet with "number" label
+    numbers.forEach((num) => {
+        spellphabetObj[
+            num
+        ] = `<span class='output-number'>number ${num}</span>`;
+    });
 
-const generateSpellphabet = () => {
+    // Variable "spellphabet" words: letters
+    // toDo: modify currentSpellphabet - define with ternary statement that checks if a custom wordlist was input?
+
+    // Combine letters array with the set spellphabet.
+    // For each lowercase letter, create a key-value pair in the spellphabet object of "[letter]: [word]"
+    lowerLetters.forEach((letter: string, index: number) => {
+        spellphabetObj[letter] = currentSpellphabet.at(index) as string;
+    });
+
+    // For each capital letter, create a key-value pair in the spellphabet object of "[letter]: [WORD]"
+    upperLetters.forEach((letter: string, index: number) => {
+        const upperSpellphabet = currentSpellphabet.map((word) =>
+            word.toUpperCase()
+        );
+
+        spellphabetObj[letter] = upperSpellphabet.at(index) as string;
+    });
+
     // Create an array from the individual characters of the generated PW.
-    let generatedPWChars = Array.from(resultEl.innerText);
+    let generatedPWChars = Array.from(password);
 
-    // map() creates a corresponding array, replacing each character with its related "spelling" string.
+    // map() creates a corresponding array, replacing each character with its corresponding "spelling" string.
     const generatedSpellingPW = generatedPWChars.map(
         (char) => spellphabetObj[char]
     );
@@ -367,14 +345,30 @@ const generateSpellphabet = () => {
     return spellingPW;
 };
 
+// || Generate password button
+
+const handleGenerate = function () {
+    const newPW = generatePassword(settings);
+
+    // Call generate password function, pass result to resultEl
+    if (newPW) resultEl.innerHTML = newPW;
+    const pword = resultEl.innerText;
+
+    // Generate a spelling alphabet version of PW, pass result to spellphabetEl
+    spellphabetEl.innerHTML = generateSpellphabet(pword, settings.spellphabet);
+};
+
+// Pass GUI variables to the Generate button on click
+generateBtn.addEventListener("click", handleGenerate);
+
 // || Copy button
 
-navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
-    if (result.state === "granted" || result.state === "prompt") {
-        /* write to the clipboard now */
-        console.log(result.state, "permission granted");
-    }
-});
+// navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
+//     if (result.state === "granted" || result.state === "prompt") {
+//         /* write to the clipboard now */
+//         console.log(result.state, "permission granted");
+//     }
+// });
 
 const copyPassword = function () {
     const password = resultEl.innerText;
@@ -401,33 +395,39 @@ clipboardBtn.addEventListener("click", copyPassword);
 
 const confirmDialogBtn = document.querySelector(".dialog-confirm-btn");
 
-const container = document.querySelector(".dialog-container");
+const container = document.querySelector(".dialog-container") as HTMLElement;
+
+// Initialize dialog
 const dialog = new A11yDialog(container);
+
+//
+//
+//
 
 // confirmDialogBtn.addEventListener("click", dialog.hide());
 
 //
 
-const modal = document.querySelector(".modal"),
-    overlay = document.querySelector(".overlay"),
-    openModalBtn = document.querySelector(".spellphabet-btn"),
-    closeModalBtn = document.querySelector(".modal-btn-close");
+// const modal = document.querySelector(".modal"),
+//     overlay = document.querySelector(".overlay"),
+//     openModalBtn = document.querySelector(".spellphabet-btn"),
+//     closeModalBtn = document.querySelector(".modal-btn-close");
 
-const toggleModal = function () {
-    modal.classList.toggle("hidden");
-    overlay.classList.toggle("hidden");
-};
+// const toggleModal = function () {
+//     modal.classList.toggle("hidden");
+//     overlay.classList.toggle("hidden");
+// };
 
 // openModalBtn.addEventListener("click", toggleModal);
 // closeModalBtn.addEventListener("click", toggleModal);
 
-overlay.addEventListener("click", toggleModal);
+// overlay.addEventListener("click", toggleModal);
 
-document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && !modal.classList.contains("hidden")) {
-        toggleModal();
-    }
-});
+// document.addEventListener("keydown", function (event) {
+//     if (event.key === "Escape" && !modal.classList.contains("hidden")) {
+//         toggleModal();
+//     }
+// });
 
 //
 //

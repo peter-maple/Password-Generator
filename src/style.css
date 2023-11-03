@@ -715,7 +715,7 @@ input[type="checkbox"] {
 }
 
 /* Modal */
-.modal {
+/* .modal {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -751,7 +751,7 @@ input[type="checkbox"] {
 .modal-heading {
     font-size: ;
     margin: 0;
-}
+} */
 
 .spell-group {
     display: block;
