@@ -21,6 +21,8 @@ const lowercaseEl = document.getElementById("lowercase") as HTMLInputElement;
 const numbersEl = document.getElementById("numbers") as HTMLInputElement;
 const symbolsEl = document.getElementById("symbols") as HTMLInputElement;
 
+const spellselectEl = document.getElementById("spellselect") as HTMLElement;
+
 // Initialize custom menu button
 // ref: https://github.com/Heydon/inclusive-menu-button/tree/master
 
@@ -31,6 +33,46 @@ const lowerLetters = charCodes.map((code) => String.fromCharCode(code));
 const upperLetters = lowerLetters.map((letter) => letter.toUpperCase());
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 const symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "="];
+
+const symbolsToDashes = function (string: string) {
+    let dashedString = string.replace(
+        /([`~!@#$%^&*()_+={}:;'"<>,. \[\]\|\\\/\?])+/g,
+        "-"
+    );
+    return dashedString.toLowerCase().trim();
+};
+
+class SpellingAlphabet {
+    name: string;
+    id: string;
+    wordList: string[];
+    elementHTML: string;
+    elem: HTMLElement | null;
+
+    constructor(name: string, wordList: string[]) {
+        this.name = name;
+        this.id = symbolsToDashes(this.name);
+        this.wordList = wordList;
+
+        this.elementHTML = this.getHTML(this.name);
+
+        spellselectEl.append(
+            document.createRange().createContextualFragment(this.elementHTML)
+        );
+
+        this.elem = document.getElementById(this.id);
+        console.log(this.elem);
+    }
+
+    getHTML = (name: string) => {
+        return `
+            <div class="option-wrapper">
+                <button class="spellphabet-option" type="button" id="${this.id}">
+                    ${name}
+                </button>
+            </div>`;
+    };
+}
 
 // Default letters word list if user doesn't set another
 const animalSpellphabet = [
@@ -62,85 +104,10 @@ const animalSpellphabet = [
     "zebra",
 ];
 
-interface Settings {
-    length: number;
-    lower: boolean;
-    upper: boolean;
-    num: boolean;
-    sym: boolean;
-    spellphabet: string[];
-}
-const settings = {
-    // Specify default values.
-    length: 15,
-    lower: true,
-    upper: true,
-    num: true,
-    sym: false,
-    spellphabet: animalSpellphabet,
-};
-
-function updateSettings() {
-    settings.length = +lengthEl.value;
-    settings.lower = lowercaseEl.checked;
-    settings.upper = uppercaseEl.checked;
-    settings.num = numbersEl.checked;
-    settings.sym = symbolsEl.checked;
-    settings.spellphabet = animalSpellphabet;
-}
-
-// Listen for changes to variables and update local storage
-lengthEl.onchange = updateSettings;
-uppercaseEl.onchange = updateSettings;
-lowercaseEl.onchange = updateSettings;
-numbersEl.onchange = updateSettings;
-symbolsEl.onchange = updateSettings;
-// spellselect trigger.....
-
-// || Core functionality
-
-// Generate password function
-const generatePassword = (settings: Settings): string | void => {
-    const availableCharacters = [
-        // If settings.lower is true, include lowerLetters in availableCharacters.
-        // Using spread syntax (...) to add the individual characters instead of the array as a single object.
-        ...(settings.lower ? lowerLetters : []),
-        ...(settings.upper ? upperLetters : []),
-        ...(settings.num ? numbers : []),
-        ...(settings.sym ? symbols : []),
-    ];
-    // console.log("availableCharacters:", availableCharacters);
-
-    let password = "";
-
-    if (availableCharacters.length === 0) {
-        alert(
-            "Please select at least one type of character to include in the password."
-        );
-        return;
-    }
-
-    for (let i = 0; i < settings.length; i++) {
-        const randomIndex = Math.floor(
-            Math.random() * availableCharacters.length
-        );
-        password += availableCharacters[randomIndex];
-    }
-
-    // Add <span> elements to password to help with coloring
-    const numbersRegex = /(\d+)/g;
-    const symbolsRegex = /(\W+)/g;
-
-    // Replace
-    let finalPassword = password
-        .replace(symbolsRegex, "<span class='output-symbol'>$1</span>")
-        .replace(numbersRegex, "<span class='output-number'>$1</span>");
-
-    return finalPassword;
-};
+new SpellingAlphabet("Animals", animalSpellphabet);
 
 // Alternative word lists for user selection
-const placeSpellphabet = [
+const placesSpellphabet = [
         "arizona",
         "boston",
         "canada",
@@ -168,7 +135,7 @@ const placeSpellphabet = [
         "yemen",
         "zimbabwe",
     ],
-    easySpellphabet = [
+    clearNEasySpellphabet = [
         "apple",
         "bagel",
         "cactus",
@@ -280,6 +247,83 @@ const placeSpellphabet = [
         "yam",
         "zucchini",
     ];
+
+interface Settings {
+    length: number;
+    lower: boolean;
+    upper: boolean;
+    num: boolean;
+    sym: boolean;
+    spellphabet: string[];
+}
+const settings = {
+    // Specify default values.
+    length: 15,
+    lower: true,
+    upper: true,
+    num: true,
+    sym: false,
+    spellphabet: animalSpellphabet,
+};
+
+function updateSettings() {
+    settings.length = +lengthEl.value;
+    settings.lower = lowercaseEl.checked;
+    settings.upper = uppercaseEl.checked;
+    settings.num = numbersEl.checked;
+    settings.sym = symbolsEl.checked;
+    settings.spellphabet = animalSpellphabet;
+}
+
+// Listen for changes to variables and update local storage
+lengthEl.onchange = updateSettings;
+uppercaseEl.onchange = updateSettings;
+lowercaseEl.onchange = updateSettings;
+numbersEl.onchange = updateSettings;
+symbolsEl.onchange = updateSettings;
+// spellselect trigger.....
+
+// || Core functionality
+
+// Generate password function
+const generatePassword = (settings: Settings): string | void => {
+    const availableCharacters = [
+        // If settings.lower is true, include lowerLetters in availableCharacters.
+        // Using spread syntax (...) to add the individual characters instead of the array as a single object.
+        ...(settings.lower ? lowerLetters : []),
+        ...(settings.upper ? upperLetters : []),
+        ...(settings.num ? numbers : []),
+        ...(settings.sym ? symbols : []),
+    ];
+    // console.log("availableCharacters:", availableCharacters);
+
+    let password = "";
+
+    if (availableCharacters.length === 0) {
+        alert(
+            "Please select at least one type of character to include in the password."
+        );
+        return;
+    }
+
+    for (let i = 0; i < settings.length; i++) {
+        const randomIndex = Math.floor(
+            Math.random() * availableCharacters.length
+        );
+        password += availableCharacters[randomIndex];
+    }
+
+    // Add <span> elements to password to help with coloring
+    const numbersRegex = /(\d+)/g;
+    const symbolsRegex = /(\W+)/g;
+
+    // Replace
+    let finalPassword = password
+        .replace(symbolsRegex, "<span class='output-symbol'>$1</span>")
+        .replace(numbersRegex, "<span class='output-number'>$1</span>");
+
+    return finalPassword;
+};
 
 // Unchanging "spellphabet" words: symbols and numbers
 const symbolsObj = {
@@ -401,8 +445,10 @@ clipboardBtn.addEventListener("click", copyPassword);
 
 // || Modal for spellphabet selection:
 
+// Identify dialog button
 const confirmDialogBtn = document.querySelector(".dialog-confirm-btn");
 
+// Identify dialog element
 const container = document.querySelector(".dialog-container") as HTMLElement;
 
 // Initialize dialog
