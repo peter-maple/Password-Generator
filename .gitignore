@@ -5,3 +5,5 @@ old_files
 solo_files
 
 dist
+
+.DS_Store
