@@ -20,6 +20,7 @@
     "homepage": "https://github.com/peter-maple/Password-Generator#readme",
     "dependencies": {
         "a11y-dialog": "^8.0.4",
+        "motion": "^10.16.4",
         "source-map-loader": "^4.0.1"
     },
     "devDependencies": {

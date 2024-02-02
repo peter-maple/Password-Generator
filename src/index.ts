@@ -1,6 +1,7 @@
 // import A11yDialog from "https://cdn.jsdelivr.net/npm/a11y-dialog@8/dist/a11y-dialog.esm.min.js" /* "a11y-dialog" */;
 
 import A11yDialog from "a11y-dialog";
+import { animate } from "motion";
 import "./style.css";
 
 if (process.env.NODE_ENV !== "production") {
@@ -14,7 +15,7 @@ const spellphabetEl = document.getElementById("spellphabet") as HTMLElement;
 const generateBtn = document.getElementById("generate") as HTMLElement;
 const clipboardBtn = document.getElementById("clipboard") as HTMLElement;
 
-const lengthEl = document.getElementById("lengthNumber") as HTMLInputElement;
+const lengthEl = document.getElementById("lengthInput") as HTMLInputElement;
 
 const uppercaseEl = document.getElementById("uppercase") as HTMLInputElement;
 const lowercaseEl = document.getElementById("lowercase") as HTMLInputElement;
@@ -22,6 +23,12 @@ const numbersEl = document.getElementById("numbers") as HTMLInputElement;
 const symbolsEl = document.getElementById("symbols") as HTMLInputElement;
 
 const spellselectEl = document.getElementById("spellselect") as HTMLElement;
+// const spellOptionsEl = document.getElementById("spellselect") as HTMLElement;
+const spellDisplayEl = document.getElementById("words-display") as HTMLElement;
+const dispLineSvg = document.getElementById("displayed-outline") as HTMLElement;
+const dialogConfirmEl = document.getElementById(
+    "dialog-confirm-btn"
+) as HTMLElement;
 
 // Initialize custom menu button
 // ref: https://github.com/Heydon/inclusive-menu-button/tree/master
@@ -34,6 +41,19 @@ const upperLetters = lowerLetters.map((letter) => letter.toUpperCase());
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 const symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "="];
 
+// || Modal dialogue for spellphabet selection:
+
+// Identify dialog button
+const confirmDialogBtn = document.querySelector(
+    ".dialog-confirm-btn"
+) as HTMLElement;
+
+// Identify dialog element
+const container = document.querySelector(".dialog-container") as HTMLElement;
+
+// Initialize dialog
+const dialog = new A11yDialog(container);
+
 const symbolsToDashes = function (string: string) {
     let dashedString = string.replace(
         /([`~!@#$%^&*()_+={}:;'"<>,. \[\]\|\\\/\?])+/g,
@@ -42,19 +62,23 @@ const symbolsToDashes = function (string: string) {
     return dashedString.toLowerCase().trim();
 };
 
+// || Spelling alphabet
+
 class SpellingAlphabet {
     name: string;
     id: string;
     wordList: string[];
     elementHTML: string;
     elem: HTMLElement | null;
+    elemY: number;
+    index: number;
 
     constructor(name: string, wordList: string[], complete = true) {
         this.name = name;
         this.id = symbolsToDashes(this.name);
         this.wordList = wordList;
 
-        this.elementHTML = this.getHTML(this.name);
+        this.elementHTML = this.getHTML(this.name, this.id);
 
         if (complete) {
             spellselectEl.append(
@@ -63,21 +87,37 @@ class SpellingAlphabet {
                     .createContextualFragment(this.elementHTML)
             );
 
-            this.elem = document.getElementById(this.id);
-        } else this.elem = null;
+            this.elem = document.getElementById(this.id) as HTMLElement;
+            this.elemY = this.elem.getBoundingClientRect().top;
+            console.log("elemY:", this.elemY);
+        } else {
+            this.elem = null;
+            this.elemY = 0;
+            console.log("fail");
+        }
         // console.log(this.elem);
 
+        this.index = spellphabets.length - 1;
         spellphabets.push(this);
-        console.log(spellphabets);
+        // console.log(spellphabets);
     }
 
-    getHTML = (name: string) => {
+    getHTML = (name: string, id: string) => {
         return `
-            <div class="option-wrapper">
-                <button class="spellphabet-option" type="button" id="${this.id}">
-                    ${name}
-                </button>
+            <div class="option-wrapper" id="${id}">
+                <div class="option-flex">
+                    <button class="pushable spellphabet-opt-btn" type="button">
+                        <span class="rim"></span>
+                        <span class="shadow"></span>
+                        <span class="edge"></span>
+                        <span class="front">${name}</span>
+                    </button>
+                    <div class="currently-active" hidden>
+                        Current
+                    </div>
+                </div>
             </div>`;
+        // <button class="spellphabet-option-btn" type="button">
     };
 }
 
@@ -112,6 +152,20 @@ const animalsSpellphabet = new SpellingAlphabet("Animals", [
     "yak",
     "zebra",
 ]);
+
+const displaySpellphabetWords = (spellphabet: SpellingAlphabet) => {
+    let list = spellphabet.wordList;
+
+    const display = list
+        // .map((item) => (item !== list.at(-1) ? `${item},` : item))
+        .map(
+            (newItem) =>
+                `<div class='spellphabet-display-word'>${newItem}</div>`
+        )
+        .join(" ");
+
+    return display;
+};
 
 // Alternative word lists for user selection
 const placesSpellphabet = new SpellingAlphabet(
@@ -263,6 +317,50 @@ const placesSpellphabet = new SpellingAlphabet(
         "zucchini",
     ]);
 
+const setDisplayedSpellphabet = (spellphabet: SpellingAlphabet) => {
+    spellDisplayEl.innerHTML = displaySpellphabetWords(spellphabet);
+    spellDisplayEl.setAttribute("data-displayed", `${spellphabet.index}`);
+
+    animate(dispLineSvg, { y: spellphabet.elemY - 4 });
+};
+
+const setActiveSpellphabet = (spellphabet: SpellingAlphabet) => {
+    const buttons = Array.from(
+        document.querySelectorAll(`.option-wrapper button`)
+    );
+    const markers = Array.from(document.querySelectorAll(`.currently-active`));
+    const activeButton = document.querySelector(
+        `#${spellphabet.id} button`
+    ) as HTMLElement;
+    const currentMarker = document.querySelector(
+        `#${spellphabet.id} .currently-active`
+    ) as HTMLElement;
+
+    buttons.forEach((btn) => btn.removeAttribute("aria-checked"));
+    markers.forEach((el) => el.setAttribute("hidden", "hidden"));
+
+    activeButton.setAttribute("aria-checked", "true");
+    currentMarker.removeAttribute("hidden");
+};
+
+const handleDialogConfirm = () =>
+    setActiveSpellphabet(
+        spellphabets.at(
+            Number(spellDisplayEl.getAttribute("data-displayed"))
+        ) as SpellingAlphabet
+    );
+
+const initializeSpellphabet = (spellphabet: SpellingAlphabet) => {
+    setActiveSpellphabet(spellphabet);
+    setDisplayedSpellphabet(spellphabet);
+};
+
+dialogConfirmEl.addEventListener("click", handleDialogConfirm);
+
+initializeSpellphabet(fantasySpellphabet);
+
+// || Other settings
+
 interface Settings {
     length: number;
     lower: boolean;
@@ -290,7 +388,7 @@ function updateSettings() {
     settings.spellphabet = animalsSpellphabet;
 }
 
-// Listen for changes to variables and update local storage
+// Listen for changes to variables and update ~local storage~
 lengthEl.onchange = updateSettings;
 uppercaseEl.onchange = updateSettings;
 lowercaseEl.onchange = updateSettings;
@@ -460,17 +558,6 @@ const copyPassword = function () {
 
 // Copy result on click clipboard button
 clipboardBtn.addEventListener("click", copyPassword);
-
-// || Modal for spellphabet selection:
-
-// Identify dialog button
-const confirmDialogBtn = document.querySelector(".dialog-confirm-btn");
-
-// Identify dialog element
-const container = document.querySelector(".dialog-container") as HTMLElement;
-
-// Initialize dialog
-const dialog = new A11yDialog(container);
 
 //
 //

@@ -33,25 +33,32 @@
                     </div>
                 </section>
                 <div class="buttons">
-                    <div class="custom-menu" data-inclusive-menu>
-                        <button
-                            class="pushable spellphabet-btn"
-                            type="button"
-                            data-a11y-dialog-show="spellselect-dialog"
-                        >
-                            <span class="rim"></span>
-                            <span class="shadow"></span>
-                            <span class="edge"></span>
-                            <span class="front">
-                                Spelling alphabet
-                                <span class="dropdown-arrow" aria-hidden="true">
-                                    ☰
+                    <div class="btn-sctn left">
+                        <div></div>
+                        <div class="custom-menu">
+                            <!-- data-inclusive-menu -->
+                            <button
+                                class="pushable spellphabet-btn"
+                                type="button"
+                                data-a11y-dialog-show="spellselect-dialog"
+                            >
+                                <span class="rim"></span>
+                                <span class="shadow"></span>
+                                <span class="edge"></span>
+                                <span class="front">
+                                    Spellphabet
+                                    <span
+                                        class="dropdown-arrow"
+                                        aria-hidden="true"
+                                    >
+                                        &#x2630;
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="number-input">
+                    <!-- <div class="number-input">
                         <span class="rim-edge"></span>
                         <input
                             type="number"
@@ -64,30 +71,39 @@
                         <label for="lengthNumber" id="lengthLabel">
                             LENGTH
                         </label>
+                    </div> -->
+                    <div class="btn-sctn center">
+                        <button
+                            type="submit"
+                            class="gen pushable"
+                            id="generate"
+                        >
+                            <span class="rim"></span>
+                            <span class="shadow"></span>
+                            <span class="edge"></span>
+                            <span class="front">Generate password</span>
+                        </button>
                     </div>
-                    <button type="submit" class="gen pushable" id="generate">
-                        <span class="rim"></span>
-                        <span class="shadow"></span>
-                        <span class="edge"></span>
-                        <span class="front">Generate password</span>
-                    </button>
-                    <button
-                        type="button"
-                        class="btn-copy pushable"
-                        id="clipboard"
-                    >
-                        <span class="rim"></span>
-                        <span class="shadow"></span>
-                        <span class="edge"></span>
-                        <span class="front">Copy</span>
-                    </button>
+                    <div class="btn-sctn right">
+                        <button
+                            type="button"
+                            class="btn-copy pushable"
+                            id="clipboard"
+                        >
+                            <span class="rim"></span>
+                            <span class="shadow"></span>
+                            <span class="edge"></span>
+                            <span class="front">Copy</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="settings-section">
+                    <!-- <div class="length-label">Length:</div> -->
                     <div class="include-label">Include:</div>
                     <div class="setting">
                         <label for="lowercase">
                             <input type="checkbox" id="lowercase" checked />
-                            <div class="push-check">
+                            <div class="check-button">
                                 <span class="label-text"
                                     >lowercase letters</span
                                 >
@@ -97,17 +113,17 @@
                     <div class="setting">
                         <label for="uppercase">
                             <input type="checkbox" id="uppercase" checked />
-                            <div class="push-check">
-                                <span class="label-text"
-                                    >uppercase letters</span
-                                >
+                            <div class="check-button">
+                                <span class="label-text">
+                                    uppercase letters
+                                </span>
                             </div>
                         </label>
                     </div>
                     <div class="setting">
                         <label for="numbers">
                             <input type="checkbox" id="numbers" checked />
-                            <div class="push-check">
+                            <div class="check-button">
                                 <span class="label-text">numbers</span>
                             </div>
                         </label>
@@ -115,10 +131,28 @@
                     <div class="setting">
                         <label for="symbols">
                             <input type="checkbox" id="symbols" unchecked />
-                            <div class="push-check">
+                            <div class="check-button">
                                 <span class="label-text">symbols</span>
                             </div>
                         </label>
+                    </div>
+                    <label
+                        for="lengthInput"
+                        id="length-label"
+                        class="length-label"
+                        >Length:</label
+                    >
+                    <div class="number-input-block setting">
+                        <!-- <span class="rim-edge"></span> -->
+                        <input
+                            class="number-input-field"
+                            type="number"
+                            id="lengthInput"
+                            min="15"
+                            max="36"
+                            step="1"
+                            value="15"
+                        />
                     </div>
                 </div>
             </div>
@@ -135,69 +169,135 @@
                 <div data-a11y-dialog-hide class="dialog-overlay"></div>
 
                 <!-- 3. The actual dialog -->
-                <div role="document">
+                <div class="dialog-content" role="document">
                     <!-- 4. The close button -->
                     <button
+                        class="dialog-close"
                         type="button"
                         data-a11y-dialog-hide
                         aria-label="Close dialog"
                     >
-                        &times;
+                        <!-- &times; -->
+                        <svg class="svg-icon" viewBox="0 0 20 20">
+                            <path
+                                fill="currentcolor"
+                                d="M15.898,4.045
+                                    c-0.271-0.272-0.713-0.272-0.986,0
+                                    l-4.71,4.711
+                                    L5.493,4.045
+                                    c-0.272-0.272-0.714-0.272-0.986,0
+                                    s-0.272,0.714,0,0.986
+                                    l4.709,4.711
+                                    l-4.71,4.711
+                                    c-0.272,0.271-0.272,0.713,0,0.986
+                                    c0.136,0.136,0.314,0.203,0.492,0.203
+                                    c0.179,0,0.357-0.067,0.493-0.203
+                                    l4.711-4.711
+                                    l4.71,4.711
+                                    c0.137,0.136,0.314,0.203,0.494,0.203
+                                    c0.178,0,0.355-0.067,0.492-0.203
+                                    c0.273-0.273,0.273-0.715,0-0.986
+                                    l-4.711-4.711
+                                    l4.711-4.711
+                                    C16.172,4.759,16.172,4.317,15.898,4.045 z"
+                            ></path>
+                        </svg>
                     </button>
 
                     <!-- 5. The dialog title -->
-                    <h1 id="dialog-title">Choose your spelling alphabet</h1>
+                    <h1 class="dialog-title" id="dialog-title">
+                        Choose your spelling alphabet
+                    </h1>
 
                     <!-- 6. Dialog content -->
-                    <div class="dialog-content">
+                    <div class="dialog-main">
                         <div class="spell-group" id="spellselect">
-                            <div class="option-wrapper">
-                                <button
-                                    class="spellphabet-option"
-                                    type="button"
-                                    aria-checked="true"
-                                >
-                                    Animals
-                                </button>
-                            </div>
-                            <div class="option-wrapper">
-                                <button
-                                    class="spellphabet-option"
-                                    type="button"
-                                >
-                                    Fantasy
-                                </button>
-                            </div>
-                            <div class="option-wrapper">
-                                <button
-                                    class="spellphabet-option"
-                                    type="button"
-                                >
-                                    Fruit and veg
-                                </button>
-                            </div>
+                            <!-- <div class="option-wrapper">
+                                <div class="option-flex">
+                                    <button
+                                        class="spellphabet-option-btn"
+                                        type="button"
+                                        aria-checked="true"
+                                    >
+                                        Animals
+                                    </button>
+                                    <div class="currently-set" hidden>
+                                        Current
+                                    </div>
+                                </div>
+
+                                <svg class="display-arrow" viewBox="0 0 27 36">
+                                    <path
+                                        d="
+                                                M2,2
+                                                L25,17
+                                                L2,34"
+                                    ></path>
+                                </svg>
+                            </div> -->
+                            <!-- <div class="option-wrapper">
+                                    <button
+                                        class="spellphabet-option-btn"
+                                        type="button"
+                                    >
+                                        Fantasy
+                                    </button>
+                                </div>
+                                <div class="option-wrapper">
+                                    <button
+                                        class="spellphabet-option-btn"
+                                        type="button"
+                                    >
+                                        Fruit and veg
+                                    </button>
+                                </div> -->
+                            <svg
+                                class="displayed-outline"
+                                id="displayed-outline"
+                                viewBox="0 0 312.8 44.7"
+                            >
+                                <path class="fill-path" />
+                                <path class="fill-path2" />
+                                <path
+                                    class="outline-path"
+                                    vector-effect="non-scaling-stroke"
+                                    d="
+                                        M 312.2,44.7
+                                        a 6.4 6.4 0 0 0 -6.4,-6.4
+                                        h -298
+                                        a 6.4 6.4 0 0 1 -6.4,-6.4
+                                        V 12.8
+                                        a 6.4 6.4 0 0 1 6.4,-6.4
+                                        h 298
+                                        a 6.4 6.4 0 0 0 6.4,-6.4"
+                                />
+                            </svg>
                         </div>
+                        <div
+                            class="words-display"
+                            id="words-display"
+                            data-displayed=""
+                        ></div>
                     </div>
-                    <button type="button" class="dialog-confirm-btn">
+                    <button
+                        type="button"
+                        class="dialog-confirm-btn"
+                        id="dialog-confirm-btn"
+                        data-a11y-dialog-hide
+                    >
                         Confirm and close
                     </button>
                 </div>
             </div>
-
-            <section class="modal hidden">
-                <h2 class="modal-heading" tabindex="-1">
-                    Choose your spelling alphabet
-                </h2>
-
-                <button
-                    type="button"
-                    class="modal-btn modal-btn-close"
-                    data-a11y-dialog-hide
-                >
-                    Confirm and close
-                </button>
-            </section>
-            <div class="overlay hidden"></div>
+        </div>
+        <div class="footer">
+            <div class="attribution">
+                Button design credit to the excellent
+                <a
+                    href="https://www.joshwcomeau.com/animation/3d-button/#introduction"
+                    >Josh W Comeau</a
+                >.
+            </div>
         </div>
 
         <!-- Load scripts -->
