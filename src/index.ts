@@ -1,7 +1,7 @@
 // import A11yDialog from "https://cdn.jsdelivr.net/npm/a11y-dialog@8/dist/a11y-dialog.esm.min.js" /* "a11y-dialog" */;
 
 import A11yDialog from "a11y-dialog";
-import { animate } from "motion";
+import { animate, spring } from "motion";
 import "./style.css";
 
 if (process.env.NODE_ENV !== "production") {
@@ -9,23 +9,26 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // Identify HTML elements
+
+// Fields for generated results
 const resultEl = document.getElementById("result") as HTMLElement;
 const spellphabetEl = document.getElementById("spellphabet") as HTMLElement;
 
+// Primary buttons
+const spellMenuBtn = document.getElementById("spell-menu-btn") as HTMLElement;
 const generateBtn = document.getElementById("generate") as HTMLElement;
 const clipboardBtn = document.getElementById("clipboard") as HTMLElement;
 
-const lengthEl = document.getElementById("lengthInput") as HTMLInputElement;
-
+// Settings inputs
 const uppercaseEl = document.getElementById("uppercase") as HTMLInputElement;
 const lowercaseEl = document.getElementById("lowercase") as HTMLInputElement;
 const numbersEl = document.getElementById("numbers") as HTMLInputElement;
 const symbolsEl = document.getElementById("symbols") as HTMLInputElement;
+const lengthEl = document.getElementById("lengthInput") as HTMLInputElement;
 
-const spellselectEl = document.getElementById("spellselect") as HTMLElement;
-// const spellOptionsEl = document.getElementById("spellselect") as HTMLElement;
+// Dialog elements
+const spellListEl = document.getElementById("spellselect") as HTMLElement;
 const spellDisplayEl = document.getElementById("words-display") as HTMLElement;
-const dispLineSvg = document.getElementById("displayed-outline") as HTMLElement;
 const dialogConfirmEl = document.getElementById(
     "dialog-confirm-btn"
 ) as HTMLElement;
@@ -69,8 +72,7 @@ class SpellingAlphabet {
     id: string;
     wordList: string[];
     elementHTML: string;
-    elem: HTMLElement | null;
-    elemY: number;
+    btnElem: HTMLElement | null;
     index: number;
 
     constructor(name: string, wordList: string[], complete = true) {
@@ -81,47 +83,103 @@ class SpellingAlphabet {
         this.elementHTML = this.getHTML(this.name, this.id);
 
         if (complete) {
-            spellselectEl.append(
+            // Add HTML for the button (see getHTML function below) to the DOM.
+            spellListEl.append(
                 document
                     .createRange()
                     .createContextualFragment(this.elementHTML)
             );
 
-            this.elem = document.getElementById(this.id) as HTMLElement;
-            this.elemY = this.elem.getBoundingClientRect().top;
-            console.log("elemY:", this.elemY);
-        } else {
-            this.elem = null;
-            this.elemY = 0;
-            console.log("fail");
-        }
-        // console.log(this.elem);
+            // Store the button element created by the above step.
+            this.btnElem = document.getElementById(this.id) as HTMLElement;
 
-        this.index = spellphabets.length - 1;
-        spellphabets.push(this);
-        // console.log(spellphabets);
+            this.btnElem.classList.add(`btn-${this.id}`);
+
+            // Add to the list of spellphabets and note its index.
+            spellphabets.push(this);
+            this.index = spellphabets.length - 1;
+
+            // Add to the keyedSpellphabets object with its ID as the key.
+            keyedSpellphabets[this.id] = this;
+        } else {
+            this.btnElem = null;
+            this.index = -1;
+        }
     }
 
     getHTML = (name: string, id: string) => {
         return `
             <div class="option-wrapper" id="${id}">
                 <div class="option-flex">
-                    <button class="pushable spellphabet-opt-btn" type="button">
-                        <span class="rim"></span>
-                        <span class="shadow"></span>
-                        <span class="edge"></span>
-                        <span class="front">${name}</span>
+                    <div class="currently-active-container">
+                        <div class="currently-active" hidden>
+                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                viewBox="0 0 448 512"
+                                title="currently active">
+                                <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                                <path d="
+                                    M438.6 278.6
+                                    c12.5 -12.5 12.5 -32.8 0 -45.3
+                                    l -160 -160
+                                    c -12.5 -12.5 -32.8 -12.5 -45.3 0
+                                    s -12.5 32.8 0 45.3
+                                    L 338.8 224 32 224
+                                    c -17.7 0 -32 14.3 -32 32
+                                    s 14.3 32 32 32
+                                    l 306.7 0
+                                    L 233.4 393.4
+                                    c -12.5 12.5 -12.5 32.8 0 45.3
+                                    s 32.8 12.5 45.3 0
+                                    l 160 -160 z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <button class="pushable spellphabet-option-btn btn-small" aria-checked="false" type="button">
+                        <span class="spellphabet-option-front">${name}</span>
                     </button>
-                    <div class="currently-active" hidden>
-                        Current
+                    <div class="currently-displayed-container">
+                        <div class="currently-displayed" hidden>
+                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                viewBox="0 0 448 512"
+                                title="currently displayed">
+                                <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                                <path d="
+                                    M438.6 278.6
+                                    c12.5 -12.5 12.5 -32.8 0 -45.3
+                                    l -160 -160
+                                    c -12.5 -12.5 -32.8 -12.5 -45.3 0
+                                    s -12.5 32.8 0 45.3
+                                    L 338.8 224 32 224
+                                    c -17.7 0 -32 14.3 -32 32
+                                    s 14.3 32 32 32
+                                    l 306.7 0
+                                    L 233.4 393.4
+                                    c -12.5 12.5 -12.5 32.8 0 45.3
+                                    s 32.8 12.5 45.3 0
+                                    l 160 -160 z"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>`;
-        // <button class="spellphabet-option-btn" type="button">
     };
 }
 
 const spellphabets: SpellingAlphabet[] = [];
+const keyedSpellphabets: { [index: string]: SpellingAlphabet } = {};
+
+const displaySpellphabetWords = (spellphabet: SpellingAlphabet) => {
+    let list = spellphabet.wordList;
+
+    const display = list
+        .map(
+            (listItem) =>
+                `<div class='spellphabet-display-word'>${listItem}</div>`
+        )
+        .join(" ");
+
+    return display;
+};
 
 // Default letters word list if user doesn't set another
 const animalsSpellphabet = new SpellingAlphabet("Animals", [
@@ -152,20 +210,6 @@ const animalsSpellphabet = new SpellingAlphabet("Animals", [
     "yak",
     "zebra",
 ]);
-
-const displaySpellphabetWords = (spellphabet: SpellingAlphabet) => {
-    let list = spellphabet.wordList;
-
-    const display = list
-        // .map((item) => (item !== list.at(-1) ? `${item},` : item))
-        .map(
-            (newItem) =>
-                `<div class='spellphabet-display-word'>${newItem}</div>`
-        )
-        .join(" ");
-
-    return display;
-};
 
 // Alternative word lists for user selection
 const placesSpellphabet = new SpellingAlphabet(
@@ -215,7 +259,7 @@ const placesSpellphabet = new SpellingAlphabet(
         "loudly",
         "magic",
         "north",
-        "opera",
+        "omelet",
         "power",
         "queen",
         "random",
@@ -315,128 +359,35 @@ const placesSpellphabet = new SpellingAlphabet(
         "x-ray fruit (made up)",
         "yam",
         "zucchini",
+    ]),
+    spaceSpellphabet = new SpellingAlphabet("Space", [
+        "asteroid",
+        "black hole",
+        "comet",
+        "dark matter",
+        "eclipse",
+        "flying saucer",
+        "galaxy",
+        "heliocentric",
+        "ice giant",
+        "jupiter",
+        "kuiper belt",
+        "lightyear",
+        "mars",
+        "nebula",
+        "orbit",
+        "pluto",
+        "quasar",
+        "rocket",
+        "space",
+        "telescope",
+        "universe",
+        "vacuum",
+        "white dwarf",
+        "x-rays",
+        "year",
+        "zodiac",
     ]);
-
-const setDisplayedSpellphabet = (spellphabet: SpellingAlphabet) => {
-    spellDisplayEl.innerHTML = displaySpellphabetWords(spellphabet);
-    spellDisplayEl.setAttribute("data-displayed", `${spellphabet.index}`);
-
-    animate(dispLineSvg, { y: spellphabet.elemY - 4 });
-};
-
-const setActiveSpellphabet = (spellphabet: SpellingAlphabet) => {
-    const buttons = Array.from(
-        document.querySelectorAll(`.option-wrapper button`)
-    );
-    const markers = Array.from(document.querySelectorAll(`.currently-active`));
-    const activeButton = document.querySelector(
-        `#${spellphabet.id} button`
-    ) as HTMLElement;
-    const currentMarker = document.querySelector(
-        `#${spellphabet.id} .currently-active`
-    ) as HTMLElement;
-
-    buttons.forEach((btn) => btn.removeAttribute("aria-checked"));
-    markers.forEach((el) => el.setAttribute("hidden", "hidden"));
-
-    activeButton.setAttribute("aria-checked", "true");
-    currentMarker.removeAttribute("hidden");
-};
-
-const handleDialogConfirm = () =>
-    setActiveSpellphabet(
-        spellphabets.at(
-            Number(spellDisplayEl.getAttribute("data-displayed"))
-        ) as SpellingAlphabet
-    );
-
-const initializeSpellphabet = (spellphabet: SpellingAlphabet) => {
-    setActiveSpellphabet(spellphabet);
-    setDisplayedSpellphabet(spellphabet);
-};
-
-dialogConfirmEl.addEventListener("click", handleDialogConfirm);
-
-initializeSpellphabet(fantasySpellphabet);
-
-// || Other settings
-
-interface Settings {
-    length: number;
-    lower: boolean;
-    upper: boolean;
-    num: boolean;
-    sym: boolean;
-    spellphabet: SpellingAlphabet;
-}
-const settings = {
-    // Specify default values.
-    length: 15,
-    lower: true,
-    upper: true,
-    num: true,
-    sym: false,
-    spellphabet: animalsSpellphabet,
-};
-
-function updateSettings() {
-    settings.length = +lengthEl.value;
-    settings.lower = lowercaseEl.checked;
-    settings.upper = uppercaseEl.checked;
-    settings.num = numbersEl.checked;
-    settings.sym = symbolsEl.checked;
-    settings.spellphabet = animalsSpellphabet;
-}
-
-// Listen for changes to variables and update ~local storage~
-lengthEl.onchange = updateSettings;
-uppercaseEl.onchange = updateSettings;
-lowercaseEl.onchange = updateSettings;
-numbersEl.onchange = updateSettings;
-symbolsEl.onchange = updateSettings;
-// spellselect trigger.....
-
-// || Core functionality
-
-// Generate password function
-const generatePassword = (settings: Settings): string | void => {
-    const availableCharacters = [
-        // If settings.lower is true, include lowerLetters in availableCharacters.
-        // Using spread syntax (...) to add the individual characters instead of the array as a single object.
-        ...(settings.lower ? lowerLetters : []),
-        ...(settings.upper ? upperLetters : []),
-        ...(settings.num ? numbers : []),
-        ...(settings.sym ? symbols : []),
-    ];
-    // console.log("availableCharacters:", availableCharacters);
-
-    let password = "";
-
-    if (availableCharacters.length === 0) {
-        alert(
-            "Please select at least one type of character to include in the password."
-        );
-        return;
-    }
-
-    for (let i = 0; i < settings.length; i++) {
-        const randomIndex = Math.floor(
-            Math.random() * availableCharacters.length
-        );
-        password += availableCharacters[randomIndex];
-    }
-
-    // Add <span> elements to password to help with coloring
-    const numbersRegex = /(\d+)/g;
-    const symbolsRegex = /(\W+)/g;
-
-    // Replace
-    let finalPassword = password
-        .replace(symbolsRegex, "<span class='output-symbol'>$1</span>")
-        .replace(numbersRegex, "<span class='output-number'>$1</span>");
-
-    return finalPassword;
-};
 
 // Unchanging "spellphabet" words: symbols and numbers
 const symbolsObj = {
@@ -477,7 +428,7 @@ const generateSpellphabet = (
     });
 
     // Variable "spellphabet" words: letters
-    // toDo: modify currentSpellphabet - define with ternary statement that checks if a custom wordlist was input?
+    // ToDo: modify currentSpellphabet - define with ternary statement that checks if a custom wordlist was input?
 
     // Combine letters array with the set spellphabet.
     // For each lowercase letter, create a key-value pair in the spellphabet object of "[letter]: [word]"
@@ -506,6 +457,195 @@ const generateSpellphabet = (
     const spellingPW = generatedSpellingPW.join(" — ");
 
     return spellingPW;
+};
+
+// || Basic PW settings
+
+interface Settings {
+    length: number;
+    lower: boolean;
+    upper: boolean;
+    num: boolean;
+    sym: boolean;
+    spellphabet: SpellingAlphabet;
+}
+const settings: Settings = {
+    // Default values:
+    length: 15,
+    lower: true,
+    upper: true,
+    num: true,
+    sym: false,
+    spellphabet: animalsSpellphabet,
+};
+
+function updateSettings() {
+    settings.length = +lengthEl.value;
+    settings.lower = lowercaseEl.checked;
+    settings.upper = uppercaseEl.checked;
+    settings.num = numbersEl.checked;
+    settings.sym = symbolsEl.checked;
+}
+
+// Listen for changes to variables and update ~local storage~
+lengthEl.onchange = updateSettings;
+uppercaseEl.onchange = updateSettings;
+lowercaseEl.onchange = updateSettings;
+numbersEl.onchange = updateSettings;
+symbolsEl.onchange = updateSettings;
+
+const setDisplayedSpellphabet = (spellphabet: SpellingAlphabet) => {
+    const buttons = Array.from(
+        document.querySelectorAll(`.option-wrapper button`)
+    );
+
+    const activeButton = document.querySelector(
+        `#${spellphabet.id} button`
+    ) as HTMLElement;
+
+    buttons.forEach((btn) => btn.setAttribute("aria-checked", "false"));
+    activeButton.setAttribute("aria-checked", "true");
+
+    const currentlyDisplayedMarkers = Array.from(
+        document.querySelectorAll(`.currently-displayed`)
+    );
+
+    const currentMarker = document.querySelector(
+        `#${spellphabet.id} .currently-displayed`
+    ) as HTMLElement;
+
+    currentlyDisplayedMarkers.forEach((el) =>
+        el.setAttribute("hidden", "hidden")
+    );
+
+    currentMarker.removeAttribute("hidden");
+
+    // Display the words of the spellphabet.
+    spellDisplayEl.innerHTML = displaySpellphabetWords(spellphabet);
+    spellDisplayEl.setAttribute("data-displayed", `${spellphabet.index}`);
+
+    // ToDo:
+    // Change border color
+
+    // Update confirm button text
+    const confirmBtnFrontEl = dialogConfirmEl.querySelector(
+        `.front`
+    ) as HTMLSpanElement;
+    confirmBtnFrontEl.textContent = `"${spellphabet.name} spellphabet, I choose you!"`;
+};
+
+const setActiveSpellphabet = (spellphabet: SpellingAlphabet) => {
+    const buttons = Array.from(
+        document.querySelectorAll(`.option-wrapper button`)
+    );
+
+    const markers = Array.from(document.querySelectorAll(`.currently-active`));
+
+    const currentMarker = document.querySelector(
+        `#${spellphabet.id} .currently-active`
+    ) as HTMLElement;
+
+    markers.forEach((el) => el.setAttribute("hidden", "hidden"));
+
+    currentMarker.removeAttribute("hidden");
+
+    // updateSpellphabet(spellphabet);
+    settings.spellphabet = spellphabet;
+
+    // Generate a spelling alphabet version of PW, pass result to spellphabetEl
+    spellphabetEl.innerHTML = generateSpellphabet(
+        resultEl.innerText,
+        settings.spellphabet.wordList
+    );
+};
+
+const handleSpellMenuBtn = () => {
+    const activeButtonMarker = document.querySelector(
+        `.option-wrapper .currently-active:not([hidden])`
+    ) as HTMLElement;
+
+    const activeButtonWrapper = activeButtonMarker.closest(
+        ".option-wrapper"
+    ) as HTMLElement;
+    console.log("activebtn:", activeButtonWrapper);
+
+    const activeSpellphabet = keyedSpellphabets[activeButtonWrapper.id];
+
+    setDisplayedSpellphabet(activeSpellphabet);
+};
+
+const handleSpellSelectBtn = (clickEvent: Event) => {
+    const selectedOptionWrapper = clickEvent.currentTarget as HTMLElement;
+    setDisplayedSpellphabet(keyedSpellphabets[selectedOptionWrapper.id]);
+};
+
+const handleDialogConfirm = () =>
+    setActiveSpellphabet(
+        spellphabets.at(
+            Number(spellDisplayEl.getAttribute("data-displayed"))
+        ) as SpellingAlphabet
+    );
+
+const initializeSpellphabet = (spellphabet: SpellingAlphabet) => {
+    setDisplayedSpellphabet(spellphabet);
+    setActiveSpellphabet(spellphabet);
+};
+
+const spellphabetOptionButtons = Array.from(
+    document.querySelectorAll(`.option-wrapper`)
+);
+spellphabetOptionButtons.forEach((button) =>
+    button.addEventListener("click", handleSpellSelectBtn)
+);
+
+spellMenuBtn.addEventListener("click", handleSpellMenuBtn);
+dialogConfirmEl.addEventListener("click", handleDialogConfirm);
+
+initializeSpellphabet(fantasySpellphabet);
+
+// || Core functionality
+
+// Generate password function
+const generatePassword = (settings: Settings): string | void => {
+    const availableCharacters = [
+        // If settings.lower is true, include lowerLetters in availableCharacters.
+        // This uses spread syntax (e.g., ...) to add the individual characters within lowerLetters instead of the lowerLetters Array as a single entry.
+        ...(settings.lower ? lowerLetters : []),
+
+        // Rinse and repeat.
+        ...(settings.upper ? upperLetters : []),
+        ...(settings.num ? numbers : []),
+        ...(settings.sym ? symbols : []),
+    ];
+    // console.log("availableCharacters:", availableCharacters);
+
+    let password = "";
+
+    if (availableCharacters.length === 0) {
+        alert(
+            "Please select at least one type of character to include in the password."
+        );
+        return;
+    }
+
+    for (let i = 0; i < settings.length; i++) {
+        const randomIndex = Math.floor(
+            Math.random() * availableCharacters.length
+        );
+        password += availableCharacters[randomIndex];
+    }
+
+    // Add <span> elements to password to help with coloring.
+    // 1. Define regex filters:
+    const numbersRegex = /(\d+)/g;
+    const symbolsRegex = /(\W+)/g;
+
+    // 2. Replace the password characters with appropriate spans:
+    let finalPassword = password
+        .replace(symbolsRegex, "<span class='output-symbol'>$1</span>")
+        .replace(numbersRegex, "<span class='output-number'>$1</span>");
+
+    return finalPassword;
 };
 
 // || Generate password button
@@ -556,8 +696,39 @@ const copyPassword = function () {
     alert("Password copied to clipboard.");
 };
 
+const handleCopy = () => copyPassword();
+
 // Copy result on click clipboard button
-clipboardBtn.addEventListener("click", copyPassword);
+clipboardBtn.addEventListener("click", handleCopy);
+
+window.addEventListener(
+    "keydown",
+    (event) => {
+        if (event.defaultPrevented) {
+            // Do nothing if the event was already processed.
+            return;
+        }
+
+        switch (event.key) {
+            case "G":
+            case "P":
+                handleGenerate(settings);
+                break;
+
+            case "C":
+                handleCopy();
+                break;
+
+            // Quit when this doesn't handle the key event.
+            default:
+                return;
+        }
+
+        // Cancel the default action to avoid it being handled twice.
+        event.preventDefault();
+    },
+    true
+);
 
 //
 //
@@ -581,12 +752,6 @@ clipboardBtn.addEventListener("click", copyPassword);
 // closeModalBtn.addEventListener("click", toggleModal);
 
 // overlay.addEventListener("click", toggleModal);
-
-// document.addEventListener("keydown", function (event) {
-//     if (event.key === "Escape" && !modal.classList.contains("hidden")) {
-//         toggleModal();
-//     }
-// });
 
 //
 //

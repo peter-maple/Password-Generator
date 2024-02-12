@@ -32,13 +32,14 @@
                         <div class="spellphabet-readout" id="spellphabet"></div>
                     </div>
                 </section>
-                <div class="buttons">
+                <div class="buttons button-vars">
                     <div class="btn-sctn left">
                         <div></div>
                         <div class="custom-menu">
                             <!-- data-inclusive-menu -->
                             <button
-                                class="pushable spellphabet-btn"
+                                class="pushable btn-small"
+                                id="spell-menu-btn"
                                 type="button"
                                 data-a11y-dialog-show="spellselect-dialog"
                             >
@@ -48,7 +49,7 @@
                                 <span class="front">
                                     Spellphabet
                                     <span
-                                        class="dropdown-arrow"
+                                        class="dropdown-icon"
                                         aria-hidden="true"
                                     >
                                         &#x2630;
@@ -58,24 +59,10 @@
                         </div>
                     </div>
 
-                    <!-- <div class="number-input">
-                        <span class="rim-edge"></span>
-                        <input
-                            type="number"
-                            id="lengthNumber"
-                            min="15"
-                            max="31"
-                            step="1"
-                            value="15"
-                        />
-                        <label for="lengthNumber" id="lengthLabel">
-                            LENGTH
-                        </label>
-                    </div> -->
                     <div class="btn-sctn center">
                         <button
                             type="submit"
-                            class="gen pushable"
+                            class="gen pushable btn-large"
                             id="generate"
                         >
                             <span class="rim"></span>
@@ -87,7 +74,7 @@
                     <div class="btn-sctn right">
                         <button
                             type="button"
-                            class="btn-copy pushable"
+                            class="btn-copy pushable btn-large"
                             id="clipboard"
                         >
                             <span class="rim"></span>
@@ -98,7 +85,6 @@
                     </div>
                 </div>
                 <div class="settings-section">
-                    <!-- <div class="length-label">Length:</div> -->
                     <div class="include-label">Include:</div>
                     <div class="setting">
                         <label for="lowercase">
@@ -143,7 +129,6 @@
                         >Length:</label
                     >
                     <div class="number-input-block setting">
-                        <!-- <span class="rim-edge"></span> -->
                         <input
                             class="number-input-field"
                             type="number"
@@ -211,82 +196,71 @@
 
                     <!-- 6. Dialog content -->
                     <div class="dialog-main">
-                        <div class="spell-group" id="spellselect">
-                            <!-- <div class="option-wrapper">
-                                <div class="option-flex">
-                                    <button
-                                        class="spellphabet-option-btn"
-                                        type="button"
-                                        aria-checked="true"
-                                    >
-                                        Animals
-                                    </button>
-                                    <div class="currently-set" hidden>
-                                        Current
+                        <!-- Left column -->
+                        <div class="pad"></div>
+                        <div class="spell-group button-vars" id="spellselect">
+                            <div
+                                class="active-legend option-wrapper-leg"
+                                id="active-legend"
+                            >
+                                <div class="option-flex-leg">
+                                    <div class="active-legend-text">
+                                        <div
+                                            class="currently-active-container-leg"
+                                        >
+                                            <div class="currently-active-leg">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 448 512"
+                                                    title="currently active"
+                                                >
+                                                    <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                                                    <path
+                                                        d="
+                                                M438.6 278.6
+                                                c12.5 -12.5 12.5 -32.8 0 -45.3
+                                                l -160 -160
+                                                c -12.5 -12.5 -32.8 -12.5 -45.3 0
+                                                s -12.5 32.8 0 45.3
+                                                L 338.8 224 32 224
+                                                c -17.7 0 -32 14.3 -32 32
+                                                s 14.3 32 32 32
+                                                l 306.7 0
+                                                L 233.4 393.4
+                                                c -12.5 12.5 -12.5 32.8 0 45.3
+                                                s 32.8 12.5 45.3 0
+                                                l 160 -160 z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        Currently active
                                     </div>
                                 </div>
-
-                                <svg class="display-arrow" viewBox="0 0 27 36">
-                                    <path
-                                        d="
-                                                M2,2
-                                                L25,17
-                                                L2,34"
-                                    ></path>
-                                </svg>
-                            </div> -->
-                            <!-- <div class="option-wrapper">
-                                    <button
-                                        class="spellphabet-option-btn"
-                                        type="button"
-                                    >
-                                        Fantasy
-                                    </button>
-                                </div>
-                                <div class="option-wrapper">
-                                    <button
-                                        class="spellphabet-option-btn"
-                                        type="button"
-                                    >
-                                        Fruit and veg
-                                    </button>
-                                </div> -->
-                            <svg
-                                class="displayed-outline"
-                                id="displayed-outline"
-                                viewBox="0 0 312.8 44.7"
-                            >
-                                <path class="fill-path" />
-                                <path class="fill-path2" />
-                                <path
-                                    class="outline-path"
-                                    vector-effect="non-scaling-stroke"
-                                    d="
-                                        M 312.2,44.7
-                                        a 6.4 6.4 0 0 0 -6.4,-6.4
-                                        h -298
-                                        a 6.4 6.4 0 0 1 -6.4,-6.4
-                                        V 12.8
-                                        a 6.4 6.4 0 0 1 6.4,-6.4
-                                        h 298
-                                        a 6.4 6.4 0 0 0 6.4,-6.4"
-                                />
-                            </svg>
+                            </div>
                         </div>
+                        <div class="pad"></div>
+
+                        <!-- Right column -->
                         <div
                             class="words-display"
                             id="words-display"
                             data-displayed=""
                         ></div>
                     </div>
-                    <button
-                        type="button"
-                        class="dialog-confirm-btn"
-                        id="dialog-confirm-btn"
-                        data-a11y-dialog-hide
-                    >
-                        Confirm and close
-                    </button>
+                    <div class="confirm-btn-wrapper">
+                        <button
+                            type="button"
+                            class="dialog-confirm-btn pushable btn-large button-vars"
+                            id="dialog-confirm-btn"
+                            data-a11y-dialog-hide
+                        >
+                            <span class="rim"></span>
+                            <span class="shadow"></span>
+                            <span class="edge"></span>
+                            <span class="front">Confirm and close</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
