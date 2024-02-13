@@ -601,7 +601,7 @@ spellphabetOptionButtons.forEach((button) =>
 spellMenuBtn.addEventListener("click", handleSpellMenuBtn);
 dialogConfirmEl.addEventListener("click", handleDialogConfirm);
 
-initializeSpellphabet(fantasySpellphabet);
+initializeSpellphabet(animalsSpellphabet);
 
 // || Core functionality
 
@@ -734,25 +734,6 @@ window.addEventListener(
 //
 //
 
-// confirmDialogBtn.addEventListener("click", dialog.hide());
-
-//
-
-// const modal = document.querySelector(".modal"),
-//     overlay = document.querySelector(".overlay"),
-//     openModalBtn = document.querySelector(".spellphabet-btn"),
-//     closeModalBtn = document.querySelector(".modal-btn-close");
-
-// const toggleModal = function () {
-//     modal.classList.toggle("hidden");
-//     overlay.classList.toggle("hidden");
-// };
-
-// openModalBtn.addEventListener("click", toggleModal);
-// closeModalBtn.addEventListener("click", toggleModal);
-
-// overlay.addEventListener("click", toggleModal);
-
 //
 //
 //
@@ -761,7 +742,7 @@ window.addEventListener(
 
 // style length [number] input to have separate + - buttons
 
-// add alternate provided spellphabets that users can select from a dropdown menu ----- then display the custom spellphabets in that dropdown menu (add name field to custom input to label list in the menu--provide a default incrementing name if none is selected)
+//  ----- then display the custom spellphabets in that dropdown menu (add name field to custom input to label list in the menu--provide a default incrementing name if none is selected)
 // add ability to delete custom word lists
 // add ability to export custom word lists ----- could just have a popover dialogue that gives a text field populated with the "csv" text
 
@@ -782,3 +763,5 @@ window.addEventListener(
 // set it all up so that the chosen basic settings can be shared
 // either using URL modifiers like the old one or with a settings export/import tool. latter is worse for single-action sharing of the tool.
 // either way requires figuring out how to make the settings reference a text area or something...
+
+// add alternate provided spellphabets that users can select from a dropdown menu
