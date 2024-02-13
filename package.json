@@ -5,7 +5,9 @@
     "private": true,
     "scripts": {
         "start": "webpack serve --open --config webpack.dev.js",
-        "build": "webpack --config webpack.prod.js"
+        "build": "webpack --config webpack.prod.js",
+        "predeploy": "npm run build",
+        "deploy": "gh-pages -d dist"
     },
     "repository": {
         "type": "git",
@@ -26,6 +28,7 @@
     "devDependencies": {
         "css-loader": "^6.8.1",
         "fork-ts-checker-webpack-plugin": "^9.0.2",
+        "gh-pages": "^6.1.1",
         "html-webpack-plugin": "^5.5.3",
         "style-loader": "^3.3.3",
         "ts-loader": "^9.5.0",
