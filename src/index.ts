@@ -494,17 +494,22 @@ lowercaseEl.onchange = updateSettings;
 numbersEl.onchange = updateSettings;
 symbolsEl.onchange = updateSettings;
 
-const setDisplayedSpellphabet = (spellphabet: SpellingAlphabet) => {
+const checkDisplayedButton = (spellphabet: SpellingAlphabet) => {
     const buttons = Array.from(
         document.querySelectorAll(`.option-wrapper button`)
     );
 
-    const activeButton = document.querySelector(
+    // Get the button that matches spellphabet arg.
+    const displayedButton = document.querySelector(
         `#${spellphabet.id} button`
     ) as HTMLElement;
 
     buttons.forEach((btn) => btn.setAttribute("aria-checked", "false"));
-    activeButton.setAttribute("aria-checked", "true");
+    displayedButton.setAttribute("aria-checked", "true");
+};
+
+const setDisplayedSpellphabet = (spellphabet: SpellingAlphabet) => {
+    checkDisplayedButton(spellphabet);
 
     const currentlyDisplayedMarkers = Array.from(
         document.querySelectorAll(`.currently-displayed`)
@@ -524,9 +529,6 @@ const setDisplayedSpellphabet = (spellphabet: SpellingAlphabet) => {
     spellDisplayEl.innerHTML = displaySpellphabetWords(spellphabet);
     spellDisplayEl.setAttribute("data-displayed", `${spellphabet.index}`);
 
-    // ToDo:
-    // Change border color
-
     // Update confirm button text
     const confirmBtnFrontEl = dialogConfirmEl.querySelector(
         `.front`
@@ -535,10 +537,6 @@ const setDisplayedSpellphabet = (spellphabet: SpellingAlphabet) => {
 };
 
 const setActiveSpellphabet = (spellphabet: SpellingAlphabet) => {
-    const buttons = Array.from(
-        document.querySelectorAll(`.option-wrapper button`)
-    );
-
     const markers = Array.from(document.querySelectorAll(`.currently-active`));
 
     const currentMarker = document.querySelector(
@@ -549,7 +547,7 @@ const setActiveSpellphabet = (spellphabet: SpellingAlphabet) => {
 
     currentMarker.removeAttribute("hidden");
 
-    // updateSpellphabet(spellphabet);
+    // Update the settings object with the selected spelling alphabet.
     settings.spellphabet = spellphabet;
 
     // Generate a spelling alphabet version of PW, pass result to spellphabetEl
@@ -558,6 +556,8 @@ const setActiveSpellphabet = (spellphabet: SpellingAlphabet) => {
         settings.spellphabet.wordList
     );
 };
+
+// || Handler functions
 
 const handleSpellMenuBtn = () => {
     const activeButtonMarker = document.querySelector(
@@ -586,11 +586,8 @@ const handleDialogConfirm = () =>
         ) as SpellingAlphabet
     );
 
-const initializeSpellphabet = (spellphabet: SpellingAlphabet) => {
-    setDisplayedSpellphabet(spellphabet);
-    setActiveSpellphabet(spellphabet);
-};
-
+// Add event listeners to buttons.
+// Individual spellphabet buttons:
 const spellphabetOptionButtons = Array.from(
     document.querySelectorAll(`.option-wrapper`)
 );
@@ -598,8 +595,19 @@ spellphabetOptionButtons.forEach((button) =>
     button.addEventListener("click", handleSpellSelectBtn)
 );
 
+// Spellphabet settings menu button:
 spellMenuBtn.addEventListener("click", handleSpellMenuBtn);
+
+// "I choose you!"/Dialog close button:
 dialogConfirmEl.addEventListener("click", handleDialogConfirm);
+
+// || Initialize
+
+// Initialize with default spellphabet.
+const initializeSpellphabet = (spellphabet: SpellingAlphabet) => {
+    setDisplayedSpellphabet(spellphabet);
+    setActiveSpellphabet(spellphabet);
+};
 
 initializeSpellphabet(animalsSpellphabet);
 
@@ -617,7 +625,6 @@ const generatePassword = (settings: Settings): string | void => {
         ...(settings.num ? numbers : []),
         ...(settings.sym ? symbols : []),
     ];
-    // console.log("availableCharacters:", availableCharacters);
 
     let password = "";
 
@@ -698,7 +705,7 @@ const copyPassword = function () {
 
 const handleCopy = () => copyPassword();
 
-// Copy result on click clipboard button
+// Copy result on clipboard button click:
 clipboardBtn.addEventListener("click", handleCopy);
 
 window.addEventListener(
