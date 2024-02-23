@@ -389,7 +389,9 @@ const placesSpellphabet = new SpellingAlphabet(
         "zodiac",
     ]);
 
-// Unchanging "spellphabet" words: symbols and numbers
+// Static "spellphabet" words: symbols and numbers
+
+// Symbols
 const symbolsObj = {
     "!": "exclamation point",
     "@": "at symbol",
@@ -598,7 +600,7 @@ spellphabetOptionButtons.forEach((button) =>
 // Spellphabet settings menu button:
 spellMenuBtn.addEventListener("click", handleSpellMenuBtn);
 
-// "I choose you!"/Dialog close button:
+// "I choose you!"/dialog close button:
 dialogConfirmEl.addEventListener("click", handleDialogConfirm);
 
 // || Initialize
@@ -613,8 +615,8 @@ initializeSpellphabet(animalsSpellphabet);
 
 // || Core functionality
 
-// Generate password function
-const generatePassword = (settings: Settings): string | void => {
+// Determine the available characters based off the current settings.
+const getAvailableCharacters = (settings: Settings): (string | number)[] => {
     const availableCharacters = [
         // If settings.lower is true, include lowerLetters in availableCharacters.
         // This uses spread syntax (e.g., ...) to add the individual characters within lowerLetters instead of the lowerLetters Array as a single entry.
@@ -626,49 +628,71 @@ const generatePassword = (settings: Settings): string | void => {
         ...(settings.sym ? symbols : []),
     ];
 
-    let password = "";
+    return availableCharacters;
+};
 
-    if (availableCharacters.length === 0) {
-        alert(
-            "Please select at least one type of character to include in the password."
-        );
-        return;
+const fetchRandomCharacter = (availableCharacters: (string | number)[]) => {
+    const randomIndex = Math.floor(Math.random() * availableCharacters.length);
+    const randomCharacter = availableCharacters[randomIndex];
+    return randomCharacter;
+};
+
+const randomArrFrom = (
+    availableCharacters: (string | number)[],
+    arrayLength: number
+) => {
+    const arr = [];
+
+    for (let i = 0; i < arrayLength; i++) {
+        arr.push(fetchRandomCharacter(availableCharacters));
     }
 
-    for (let i = 0; i < settings.length; i++) {
-        const randomIndex = Math.floor(
-            Math.random() * availableCharacters.length
-        );
-        password += availableCharacters[randomIndex];
-    }
+    return arr;
+};
 
-    // Add <span> elements to password to help with coloring.
+// Generate password function
+const generatePassword = (settings: Settings): string | void => {
+    const availableCharacters = getAvailableCharacters(settings);
+
+    const passwordCharacters = randomArrFrom(
+        availableCharacters,
+        settings.length
+    );
+
+    const rawPassword = passwordCharacters.join();
+
+    // Add <span> elements to password to provide stylable classes for coloring.
     // 1. Define regex filters:
     const numbersRegex = /(\d+)/g;
     const symbolsRegex = /(\W+)/g;
 
     // 2. Replace the password characters with appropriate spans:
-    let finalPassword = password
+    const finalPasswordHTML = rawPassword
         .replace(symbolsRegex, "<span class='output-symbol'>$1</span>")
         .replace(numbersRegex, "<span class='output-number'>$1</span>");
 
-    return finalPassword;
+    return finalPasswordHTML;
 };
 
 // || Generate password button
 
 const handleGenerate = function (settings: Settings) {
+    // Call generate password function, pass result to resultEl.
     const newPW = generatePassword(settings);
 
-    // Call generate password function, pass result to resultEl
-    if (newPW) resultEl.innerHTML = newPW;
-    const pword = resultEl.innerText;
+    if (newPW) {
+        // Update displayed HTML.
+        resultEl.innerHTML = newPW;
 
-    // Generate a spelling alphabet version of PW, pass result to spellphabetEl
-    spellphabetEl.innerHTML = generateSpellphabet(
-        pword,
-        settings.spellphabet.wordList
-    );
+        // Read innerText property to ignore markup.
+        const pword = resultEl.innerText;
+
+        // Generate a spelling alphabet version of PW, pass result to spellphabetEl.
+        spellphabetEl.innerHTML = generateSpellphabet(
+            pword,
+            settings.spellphabet.wordList
+        );
+    }
 };
 
 // Pass GUI variables to the Generate button on click
@@ -707,6 +731,8 @@ const handleCopy = () => copyPassword();
 
 // Copy result on clipboard button click:
 clipboardBtn.addEventListener("click", handleCopy);
+
+// || Keyboard shortcuts
 
 window.addEventListener(
     "keydown",
