@@ -1,14 +1,15 @@
 // import A11yDialog from "https://cdn.jsdelivr.net/npm/a11y-dialog@8/dist/a11y-dialog.esm.min.js" /* "a11y-dialog" */;
 
 import A11yDialog from "a11y-dialog";
-import { animate, spring } from "motion";
+// import { animate, spring } from "motion";
 import "./style.css";
 
 if (process.env.NODE_ENV !== "production") {
     console.log("Looks like we are in development mode!");
 }
-
-// Identify HTML elements
+//
+// || HTML elements
+//
 
 // Fields for generated results
 const resultEl = document.getElementById("result") as HTMLElement;
@@ -44,7 +45,9 @@ const upperLetters = lowerLetters.map((letter) => letter.toUpperCase());
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 const symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "="];
 
+//
 // || Modal dialogue for spellphabet selection:
+//
 
 // Identify dialog button
 const confirmDialogBtn = document.querySelector(
@@ -57,7 +60,7 @@ const container = document.querySelector(".dialog-container") as HTMLElement;
 // Initialize dialog
 const dialog = new A11yDialog(container);
 
-const symbolsToDashes = function (string: string) {
+const symbolsToDashes = (string: string) => {
     let dashedString = string.replace(
         /([`~!@#$%^&*()_+={}:;'"<>,. \[\]\|\\\/\?])+/g,
         "-"
@@ -65,7 +68,9 @@ const symbolsToDashes = function (string: string) {
     return dashedString.toLowerCase().trim();
 };
 
+//
 // || Spelling alphabet
+//
 
 class SpellingAlphabet {
     name: string;
@@ -108,7 +113,7 @@ class SpellingAlphabet {
     }
 
     getHTML = (name: string, id: string) => {
-        return `
+        return /* html */ `
             <div class="option-wrapper" id="${id}">
                 <div class="option-flex">
                     <div class="currently-active-container">
@@ -251,7 +256,7 @@ const placesSpellphabet = new SpellingAlphabet(
         "desert",
         "eagle",
         "fluffy",
-        "goblet",
+        "goofy",
         "happy",
         "igloo",
         "joker",
@@ -266,7 +271,7 @@ const placesSpellphabet = new SpellingAlphabet(
         "swamp",
         "token",
         "unique",
-        "vacuum",
+        "vampire",
         "water",
         "x-ray",
         "yellow",
@@ -407,7 +412,7 @@ const symbolsObj = {
 const generateSpellphabet = (
     password: string,
     // Provide animalsSpellphabet as a default argument:
-    currentSpellphabet: string[] = animalsSpellphabet.wordList
+    currentSpellphabetList: string[] = animalsSpellphabet.wordList
 ) => {
     interface SpellingAlphabetType {
         [index: string]: string;
@@ -430,17 +435,17 @@ const generateSpellphabet = (
     });
 
     // Variable "spellphabet" words: letters
-    // ToDo: modify currentSpellphabet - define with ternary statement that checks if a custom wordlist was input?
+    // ToDo: modify currentSpellphabetList - define with ternary statement that checks if a custom wordlist was input?
 
     // Combine letters array with the set spellphabet.
     // For each lowercase letter, create a key-value pair in the spellphabet object of "[letter]: [word]"
     lowerLetters.forEach((letter: string, index: number) => {
-        spellphabetObj[letter] = currentSpellphabet.at(index) as string;
+        spellphabetObj[letter] = currentSpellphabetList.at(index) as string;
     });
 
     // For each capital letter, create a key-value pair in the spellphabet object of "[letter]: [WORD]"
     upperLetters.forEach((letter: string, index: number) => {
-        const upperSpellphabet = currentSpellphabet.map((word) =>
+        const upperSpellphabet = currentSpellphabetList.map((word) =>
             word.toUpperCase()
         );
 
@@ -461,7 +466,9 @@ const generateSpellphabet = (
     return spellingPW;
 };
 
+//
 // || Basic PW settings
+//
 
 interface Settings {
     length: number;
@@ -482,11 +489,17 @@ const settings: Settings = {
 };
 
 function updateSettings() {
-    settings.length = +lengthEl.value;
+    settings.length = Number(lengthEl.value);
     settings.lower = lowercaseEl.checked;
     settings.upper = uppercaseEl.checked;
     settings.num = numbersEl.checked;
     settings.sym = symbolsEl.checked;
+
+    if (localStorage.getItem("spellphabet")) {
+        let stored = localStorage.getItem("spellphabet") as string;
+        let spellphabet = JSON.parse(stored);
+        settings.spellphabet = spellphabet;
+    }
 }
 
 // Listen for changes to variables and update ~local storage~
@@ -538,6 +551,10 @@ const setDisplayedSpellphabet = (spellphabet: SpellingAlphabet) => {
     confirmBtnFrontEl.textContent = `"${spellphabet.name} spellphabet, I choose you!"`;
 };
 
+const setStoredSpellphabet = function (spellphabet: SpellingAlphabet) {
+    localStorage.setItem("spellphabet", JSON.stringify(spellphabet));
+};
+
 const setActiveSpellphabet = (spellphabet: SpellingAlphabet) => {
     const markers = Array.from(document.querySelectorAll(`.currently-active`));
 
@@ -549,19 +566,24 @@ const setActiveSpellphabet = (spellphabet: SpellingAlphabet) => {
 
     currentMarker.removeAttribute("hidden");
 
+    // Store the selected spelling alphabet for future browser settings.
+    setStoredSpellphabet(spellphabet);
+
     // Update the settings object with the selected spelling alphabet.
     settings.spellphabet = spellphabet;
 
-    // Generate a spelling alphabet version of PW, pass result to spellphabetEl
+    // Generate a spelling alphabet version of PW with the new spelling alphabet and pass the result to spellphabetEl.
     spellphabetEl.innerHTML = generateSpellphabet(
         resultEl.innerText,
         settings.spellphabet.wordList
     );
 };
 
+//
 // || Handler functions
+//
 
-const handleSpellMenuBtn = () => {
+const handleSpellMenuBtn = function () {
     const activeButtonMarker = document.querySelector(
         `.option-wrapper .currently-active:not([hidden])`
     ) as HTMLElement;
@@ -576,19 +598,21 @@ const handleSpellMenuBtn = () => {
     setDisplayedSpellphabet(activeSpellphabet);
 };
 
-const handleSpellSelectBtn = (clickEvent: Event) => {
+const handleSpellSelectBtn = function (clickEvent: Event) {
     const selectedOptionWrapper = clickEvent.currentTarget as HTMLElement;
     setDisplayedSpellphabet(keyedSpellphabets[selectedOptionWrapper.id]);
 };
 
-const handleDialogConfirm = () =>
+const handleDialogConfirm = function () {
     setActiveSpellphabet(
         spellphabets.at(
             Number(spellDisplayEl.getAttribute("data-displayed"))
         ) as SpellingAlphabet
     );
+};
 
 // Add event listeners to buttons.
+
 // Individual spellphabet buttons:
 const spellphabetOptionButtons = Array.from(
     document.querySelectorAll(`.option-wrapper`)
@@ -603,17 +627,36 @@ spellMenuBtn.addEventListener("click", handleSpellMenuBtn);
 // "I choose you!"/dialog close button:
 dialogConfirmEl.addEventListener("click", handleDialogConfirm);
 
-// || Initialize
+//
+// || Initialization
+//
 
-// Initialize with default spellphabet.
+/**
+ * @returns The pre-set spelling alphabet from localStorage or the default.
+ */
+const getSpellphabet = () => {
+    const stored = localStorage.getItem("spellphabet");
+    let spellphabet: SpellingAlphabet;
+
+    if (stored) spellphabet = JSON.parse(stored);
+    else spellphabet = settings.spellphabet;
+
+    return spellphabet;
+};
+
 const initializeSpellphabet = (spellphabet: SpellingAlphabet) => {
     setDisplayedSpellphabet(spellphabet);
     setActiveSpellphabet(spellphabet);
 };
 
-initializeSpellphabet(animalsSpellphabet);
+document.addEventListener("DOMContentLoaded", () => {
+    const spellphabet = getSpellphabet();
+    initializeSpellphabet(spellphabet);
+});
 
+//
 // || Core functionality
+//
 
 // Determine the available characters based off the current settings.
 const getAvailableCharacters = (settings: Settings): (string | number)[] => {
@@ -659,7 +702,7 @@ const generatePassword = (settings: Settings): string | void => {
         settings.length
     );
 
-    const rawPassword = passwordCharacters.join();
+    const rawPassword = passwordCharacters.join("");
 
     // Add <span> elements to password to provide stylable classes for coloring.
     // 1. Define regex filters:
@@ -674,7 +717,9 @@ const generatePassword = (settings: Settings): string | void => {
     return finalPasswordHTML;
 };
 
+//
 // || Generate password button
+//
 
 const handleGenerate = function (settings: Settings) {
     // Call generate password function, pass result to resultEl.
@@ -700,7 +745,9 @@ generateBtn.addEventListener("click", () => {
     handleGenerate(settings);
 });
 
+//
 // || Copy button
+//
 
 // navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
 //     if (result.state === "granted" || result.state === "prompt") {
@@ -732,7 +779,9 @@ const handleCopy = () => copyPassword();
 // Copy result on clipboard button click:
 clipboardBtn.addEventListener("click", handleCopy);
 
+//
 // || Keyboard shortcuts
+//
 
 window.addEventListener(
     "keydown",
