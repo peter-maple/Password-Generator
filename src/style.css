@@ -117,7 +117,10 @@ body {
         hsl(240, 100%, 97%)
     );
     background-blend-mode: multiply;
-    padding: 25px;
+
+    --page-padding: 25px;
+
+    padding: var(--page-padding);
     min-height: 100vh; /* legacy browser support */
     min-height: 100svh;
     height: 105%;
@@ -127,14 +130,30 @@ body {
 }
 
 .app-container {
+    container: main / inline-size;
+
     background-color: var(--color-bkg-2);
     box-shadow: 0px 9px 40px -30px hsl(0, 0%, 62%);
     border-radius: 8px;
 
-    padding: 30px 0.8rem 1.8rem;
+    --main-inline-padding: 0.8rem;
 
-    width: 47.8rem;
+    padding: /* top */ 30px var(--main-inline-padding) /* bottom */ 1.8rem;
 
+    --main-max-width: 47.8rem;
+    --max-inner-width: 45rem;
+
+    width: clamp(25rem, calc(100vw - 44px), var(--main-max-width));
+
+    position: relative;
+}
+
+.main-grid {
+    width: max-content;
+    /* Grid */
+    display: grid;
+    grid-template-columns: min-content;
+    justify-content: center;
     position: relative;
 }
 
@@ -146,10 +165,17 @@ body {
 
 .result-section {
     background-color: var(--color-bkg-2);
-    padding: 20px 0;
+
+    --result-inline-pad: 20px;
+
+    padding: var(--result-inline-pad) 0;
     position: relative;
-    width: 100%;
     font-family: "Fira code", Courier, monospace;
+
+    max-width: calc(var(--main-max-width) - 2 * var(--main-inline-padding));
+    width: calc(
+        100svw - 2 * var(--page-padding) - 2 * var(--main-inline-padding)
+    );
 }
 
 .result-container {
@@ -237,7 +263,10 @@ body {
     margin: auto;
     padding-left: 1.7rem; /* manually tuned for visual balance */
 
-    width: 45rem;
+    width: calc(
+        100svw - 2 * var(--page-padding) - 2 * var(--main-inline-padding)
+    );
+    max-width: 45rem;
 
     position: relative;
 }
@@ -246,7 +275,8 @@ body {
     position: relative;
     display: flex;
 }
-.btn-sctn.left {
+
+.left {
     justify-content: right;
 }
 
@@ -385,7 +415,7 @@ body {
     --pad-block: 0.75rem;
     --pad-inline: 2.625rem;
 }
-.custom-menu {
+.alphabet-menu {
     display: grid;
     align-items: center;
 
@@ -474,7 +504,7 @@ body {
 .settings-section {
     font-size: 0.79rem;
     display: grid;
-    grid-template-columns: min-content;
+    grid-template-columns: repeat(7, max-content);
     gap: 0.7rem;
     margin: 2.5rem 1.2rem 0;
 
@@ -485,6 +515,9 @@ body {
     position: relative;
     box-shadow: 0 0 0 4px var(--color-num-bord);
     border-radius: 0.5rem;
+
+    width: -moz-fit-content;
+    width: fit-content;
 }
 
 .number-input-field {
@@ -530,8 +563,8 @@ input[type="number"]::-webkit-outer-spin-button {
 .include-label,
 .setting {
     /* position: relative; */
-    grid-row: 1;
-    width: fit-content;
+    /* grid-row: 1; */
+    /* width: fit-content; */
 }
 
 .length-label,
@@ -648,6 +681,89 @@ input:focus-visible + .check-button {
     z-index: 1;
 }
 
+/*  */
+
+@container main (39.4rem < width < calc(47.8rem - 2 * 0.8rem)) {
+    .main-grid {
+        /* Grid */
+        grid-template-columns: max-content;
+    }
+    .result-section {
+        width: calc(
+            100svw - 2 * var(--page-padding) - 2 * var(--main-inline-padding)
+        );
+    }
+    .buttons {
+        width: max-content;
+        grid-template-columns: repeat(3, max-content);
+        padding-left: 0;
+
+        --min-gap: 1.5rem;
+        --max-gap: 2rem;
+        --clamp-calc: calc(
+            100svw / calc(47.8rem - 2 * 0.8rem) *
+                (var(--max-gap) - var(--min-gap)) + var(--min-gap)
+        );
+        gap: clamp(var(--min-gap), var(--clamp-calc), var(--max-gap));
+    }
+    .settings-section {
+        font-size: 0.79rem;
+        display: grid;
+        grid-template-columns: repeat(5, max-content);
+        grid-auto-rows: min-content;
+        gap: 0.7rem;
+        margin-block: 2.5rem 0;
+        margin-inline: auto;
+    }
+}
+
+@container main (27.25 < width <= 39.4rem) {
+    .main-grid {
+        /* width: 100%; */
+
+        /* Grid */
+        grid-template-columns: max-content;
+    }
+    .result-section {
+        width: calc(
+            100svw - 2 * var(--page-padding) - 2 * var(--main-inline-padding)
+        );
+    }
+    .buttons {
+        /* width: 100%; */
+        justify-content: center;
+        grid-template-columns: none;
+        grid-template-areas: "a a" "b c";
+        padding-left: 0;
+    }
+    .btn-sctn {
+        position: relative;
+        display: flex;
+    }
+    .left {
+        grid-area: b;
+        justify-content: right;
+    }
+    .center {
+        grid-area: a;
+    }
+    .right {
+        grid-area: c;
+        justify-content: left;
+    }
+
+    .settings-section {
+        font-size: 0.79rem;
+        display: grid;
+        grid-template-columns: repeat(5, max-content);
+        grid-auto-rows: min-content;
+        gap: 0.7rem;
+        margin-block: 2.5rem 0;
+        margin-inline: auto;
+    }
+}
+
+/* Animate the colored outline of selected character sets. */
 /* prettier-ignore */
 @keyframes rotation {
     0%   { --gradient-angle: 0deg; }
