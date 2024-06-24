@@ -633,7 +633,7 @@ dialogConfirmEl.addEventListener("click", handleDialogConfirm);
 /**
  * @returns The pre-set spelling alphabet from localStorage or the default.
  */
-const getSpellphabet = () => {
+const getSetSpellphabet = () => {
     const stored = localStorage.getItem("spellphabet");
     let spellphabet: SpellingAlphabet;
 
@@ -648,9 +648,21 @@ const initializeSpellphabet = (spellphabet: SpellingAlphabet) => {
     setActiveSpellphabet(spellphabet);
 };
 
+const revealSVGs = function () {
+    const appElem = document.querySelector(".app-container") as HTMLElement;
+    const dialogElem = document.querySelector(
+        ".dialog-container"
+    ) as HTMLElement;
+
+    appElem.style.opacity = "";
+    dialogElem.style.opacity = "";
+};
+
 document.addEventListener("DOMContentLoaded", () => {
-    const spellphabet = getSpellphabet();
+    const spellphabet = getSetSpellphabet();
     initializeSpellphabet(spellphabet);
+
+    revealSVGs();
 });
 
 //
