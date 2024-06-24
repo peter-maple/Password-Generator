@@ -8,6 +8,7 @@ import "./main-structure.css";
 if (process.env.NODE_ENV !== "production") {
     console.log("Looks like we are in development mode!");
 }
+
 //
 // || HTML elements
 //
@@ -34,9 +35,6 @@ const spellDisplayEl = document.getElementById("words-display") as HTMLElement;
 const dialogConfirmEl = document.getElementById(
     "dialog-confirm-btn"
 ) as HTMLElement;
-
-// Initialize custom menu button
-// ref: https://github.com/Heydon/inclusive-menu-button/tree/master
 
 // Define allowed characters
 // Character codes for lowercase and uppercase letters pulled from Unicode characters (lowercase a is #97)
@@ -259,7 +257,7 @@ const placesSpellphabet = new SpellingAlphabet(
         "fluffy",
         "goofy",
         "happy",
-        "igloo",
+        "image",
         "joker",
         "king",
         "listen",
@@ -438,7 +436,7 @@ const generateSpellphabet = (
     // Variable "spellphabet" words: letters
     // ToDo: modify currentSpellphabetList - define with ternary statement that checks if a custom wordlist was input?
 
-    // Combine letters array with the set spellphabet.
+    // Combine letters array with the selected spellphabet.
     // For each lowercase letter, create a key-value pair in the spellphabet object of "[letter]: [word]"
     lowerLetters.forEach((letter: string, index: number) => {
         spellphabetObj[letter] = currentSpellphabetList.at(index) as string;
@@ -757,7 +755,17 @@ generateBtn.addEventListener("click", () => {
 //     }
 // });
 
-const copyPassword = function () {
+// button.addEventListener("click", () => writeClipboardText("<empty clipboard>"));
+
+async function writeClipboardText(text: string) {
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (error: any) {
+        console.error(error.message);
+    }
+}
+
+const copyPasswordNav = async function () {
     const password = resultEl.innerText;
 
     if (!password) {
@@ -765,17 +773,34 @@ const copyPassword = function () {
         return;
     }
 
-    const textarea = document.createElement("textarea");
+    await writeClipboardText(password);
 
-    textarea.value = password;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand("copy");
-    textarea.remove();
     alert("Password copied to clipboard.");
+
+    return;
 };
 
-const handleCopy = () => copyPassword();
+// const copyPassword = function () {
+//     const password = resultEl.innerText;
+
+//     if (!password) {
+//         alert("Nothing to copy. Generate a password first.");
+//         return;
+//     }
+
+//     const textarea = document.createElement("textarea");
+
+//     textarea.value = password;
+//     document.body.appendChild(textarea);
+//     textarea.select();
+//     document.execCommand("copy");
+//     textarea.remove();
+//     alert("Password copied to clipboard.");
+
+//     return;
+// };
+
+const handleCopy = () => copyPasswordNav();
 
 // Copy result on clipboard button click:
 clipboardBtn.addEventListener("click", handleCopy);

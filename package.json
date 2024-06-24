@@ -1,7 +1,7 @@
 {
     "name": "password-generator",
     "description": "",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "private": true,
     "scripts": {
         "start": "webpack serve --open --config webpack.dev.js",
@@ -22,6 +22,7 @@
     "homepage": "https://github.com/peter-maple/Password-Generator#readme",
     "dependencies": {
         "a11y-dialog": "^8.0.4",
+        "lottie-web": "^5.12.2",
         "motion": "^10.16.4",
         "source-map-loader": "^4.0.1"
     },

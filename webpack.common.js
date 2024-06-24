@@ -3,11 +3,11 @@ const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    mode: "development",
-
     context: __dirname, // to automatically find tsconfig.json
     entry: {
-        index: "./src/index.ts",
+        page: ["./src/index.ts" /* , "./src/kpowTiltDemo.js" */],
+        // index: "./src/index.ts",
+        // demo: "./src/kpowTiltDemo.js",
     },
     output: {
         filename: "[name].bundle.js",
