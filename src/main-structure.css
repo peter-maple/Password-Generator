@@ -1,0 +1,169 @@
+.app-container {
+    container: main / inline-size;
+
+    background-color: var(--color-bkg-2);
+    box-shadow: 0px 9px 40px -30px hsl(0, 0%, 62%);
+    border-radius: 8px;
+
+    --main-inline-padding: 0.8rem;
+
+    padding: /* top */ 30px var(--main-inline-padding) /* bottom */ 1.8rem;
+
+    --main-max-width: 47.8rem;
+    --max-inner-width: 45rem;
+
+    width: clamp(28rem, calc(100vw - 44px), var(--main-max-width));
+
+    --main-container-max-width: calc(
+        var(--main-max-width) - 2 * var(--main-inline-padding)
+    );
+
+    position: relative;
+}
+
+.main-grid {
+    width: 100%;
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    --content-block-pad: 1.4rem;
+}
+
+.title {
+    font-weight: 700;
+    margin: 5px 0 5px;
+    text-align: center;
+}
+
+.result-section {
+    background-color: var(--color-bkg-2);
+
+    padding: var(--content-block-pad) 0;
+    position: relative;
+    font-family: "Fira code", Courier, monospace;
+
+    max-width: var(--main-container-max-width);
+    width: 100%;
+}
+
+.buttons {
+    position: relative;
+
+    display: flex;
+    gap: 2rem;
+}
+
+@container main ( width < calc(47.8rem - 2 * 0.8rem)) {
+    .settings-section {
+        font-size: 0.79rem;
+
+        grid-template-columns: repeat(5, max-content);
+        grid-auto-rows: min-content;
+        gap: 0.7rem;
+        margin-block: 2.5rem 0;
+        margin-inline: auto;
+    }
+}
+
+@container main (width < 39.6rem) {
+    .buttons {
+        display: grid;
+        grid-template-areas: "a b" "c c";
+        padding-left: 0;
+        gap: 1.5rem;
+    }
+    .btn-sctn {
+        position: relative;
+        display: flex;
+    }
+    .left {
+        grid-area: c;
+        justify-content: center;
+    }
+    .center {
+        grid-area: a;
+    }
+    .right {
+        grid-area: b;
+        justify-content: left;
+    }
+
+    .settings-section {
+        grid-template-areas: "a b c d e" "f g h i j";
+    }
+    .include-label {
+        grid-area: a;
+    }
+    .setting:has(#lowercase) {
+        grid-area: b;
+    }
+    .setting:has(#uppercase) {
+        grid-area: g;
+    }
+    .setting:has(#numbers) {
+        grid-area: c;
+    }
+    .setting:has(#symbols) {
+        grid-area: h;
+    }
+    .length-label {
+        grid-area: d;
+    }
+    .number-input-block {
+        grid-area: e;
+    }
+}
+
+@container main (width < 36rem) {
+    .buttons {
+        display: grid;
+        grid-template-areas: "a a" "b c";
+        padding-left: 0;
+        gap: 1.5rem;
+    }
+    .btn-sctn {
+        position: relative;
+        display: flex;
+    }
+    .left {
+        grid-area: b;
+        justify-content: right;
+    }
+    .center {
+        grid-area: a;
+    }
+    .right {
+        grid-area: c;
+        justify-content: left;
+    }
+}
+
+@container main (width < 30.5rem) {
+    .settings-section {
+        grid-template-areas: "a b c" "d e f" "g h i";
+    }
+    .include-label {
+        grid-area: a;
+    }
+    .setting:has(#lowercase) {
+        grid-area: b;
+    }
+    .setting:has(#uppercase) {
+        grid-area: e;
+    }
+    .setting:has(#numbers) {
+        grid-area: c;
+    }
+    .setting:has(#symbols) {
+        grid-area: f;
+    }
+    .length-label {
+        grid-area: g;
+    }
+    .number-input-block {
+        grid-area: h;
+    }
+}

@@ -3,6 +3,7 @@
 import A11yDialog from "a11y-dialog";
 // import { animate, spring } from "motion";
 import "./style.css";
+import "./main-structure.css";
 
 if (process.env.NODE_ENV !== "production") {
     console.log("Looks like we are in development mode!");
